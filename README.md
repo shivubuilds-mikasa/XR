@@ -8,7 +8,7 @@
 
 <br/>
 
-[![Live Demo](https://img.shields.io/badge/%E2%9C%A6_LIVE_DEMO-Enter_the_Gallery-f7c873?style=for-the-badge&labelColor=1a1a2e)](https://YOUR_USERNAME.github.io/virtual-art-gallery/)
+[![Live Demo](https://img.shields.io/badge/%E2%9C%A6_LIVE_DEMO-Enter_the_Gallery-f7c873?style=for-the-badge&labelColor=1a1a2e)](https://shivubuilds-mikasa.github.io/XR/)
 [![Three.js](https://img.shields.io/badge/Three.js-WebGL-000000?style=for-the-badge&logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-Build-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Deployed-222222?style=for-the-badge&logo=github&logoColor=white)](https://pages.github.com/)
