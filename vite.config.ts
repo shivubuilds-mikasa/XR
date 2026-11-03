@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: '/virtual-art-gallery/',
+  base: '/XR/',
   assetsInclude: ["**/*.obj", "**/*.mtl", "**/*.glb", "**/*.gltf", "**/*.hdr", "**/*.exr"],
   build: {
     rollupOptions: {
