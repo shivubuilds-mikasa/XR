@@ -13,11 +13,6 @@
 [![Vite](https://img.shields.io/badge/Vite-Build-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 [![GitHub Pages](https://img.shields.io/badge/GitHub_Pages-Deployed-222222?style=for-the-badge&logo=github&logoColor=white)](https://pages.github.com/)
 
-![Stars](https://img.shields.io/github/stars/YOUR_USERNAME/virtual-art-gallery?style=social)
-![Forks](https://img.shields.io/github/forks/YOUR_USERNAME/virtual-art-gallery?style=social)
-![Last Commit](https://img.shields.io/github/last-commit/YOUR_USERNAME/virtual-art-gallery?style=flat-square&color=f7c873&labelColor=1a1a2e)
-![Repo Size](https://img.shields.io/github/repo-size/YOUR_USERNAME/virtual-art-gallery?style=flat-square&color=f7c873&labelColor=1a1a2e)
-
 </div>
 
 ---
