@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="430" viewBox="0 0 1200 430" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">Atelier Museum</title>
+  <desc id="desc">An animated, cinematic view down a warmly lit digital art gallery.</desc>
+  <defs>
+    <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#26362C"/><stop offset="1" stop-color="#111914"/></linearGradient>
+    <linearGradient id="floor" x1=".5" y1="0" x2=".5" y2="1"><stop stop-color="#A17B4E"/><stop offset="1" stop-color="#33291F"/></linearGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F0D5A0"/><stop offset=".52" stop-color="#C69A5C"/><stop offset="1" stop-color="#8D6337"/></linearGradient>
+    <radialGradient id="glow"><stop stop-color="#E7C487" stop-opacity=".28"/><stop offset="1" stop-color="#E7C487" stop-opacity="0"/></radialGradient>
+    <pattern id="tiles" width="54" height="28" patternUnits="userSpaceOnUse"><path d="M0 0H54M0 0V28M54 0V28" stroke="#E3C28C" stroke-opacity=".1"/><path d="M27 0V28" stroke="#E3C28C" stroke-opacity=".06"/></pattern>
+    <filter id="soft"><feGaussianBlur stdDeviation="18"/></filter>
+    <style>
+      .lamp { animation: breathe 4s ease-in-out infinite alternate; transform-origin: center; }
+      .lamp.delay { animation-delay: -2s; }
+      .dust { animation: drift 12s linear infinite; }
+      .dust.d2 { animation-delay: -4s; }
+      .dust.d3 { animation-delay: -8s; }
+      .beam { animation: shimmer 6s ease-in-out infinite alternate; }
+      @keyframes breathe { from { opacity: .45; } to { opacity: 1; } }
+      @keyframes drift { from { transform: translate(0, 20px); opacity: 0; } 15% { opacity: .7; } 85% { opacity: .6; } to { transform: translate(22px, -48px); opacity: 0; } }
+      @keyframes shimmer { from { opacity: .3; } to { opacity: .75; } }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; } }
+    </style>
+  </defs>
+
+  <rect width="1200" height="430" rx="22" fill="#101511"/>
+  <path d="M0 0h1200v255L600 330 0 255V0Z" fill="url(#wall)"/>
+  <path d="m0 255 600 75 600-75v175H0V255Z" fill="url(#floor)"/>
+  <path d="m0 255 600 75 600-75v175H0V255Z" fill="url(#tiles)"/>
+  <path d="M0 254 600 329 1200 254" stroke="#C9A16A" stroke-opacity=".52" stroke-width="3"/>
+  <path d="M600 329v101M0 255l600 75M1200 255 600 330" stroke="#E0BC82" stroke-opacity=".18"/>
+
+  <!-- Receding framed works create a gallery vanishing point. -->
+  <g opacity=".88">
+    <path d="m74 117 111 20v98L74 221v-104Z" fill="#3A271B" stroke="url(#gold)" stroke-width="5"/>
+    <path d="m87 131 84 15v71l-84-15v-71Z" fill="#596C55"/>
+    <path d="m87 186 84 15v21l-84-15v-21Z" fill="#B17B56" opacity=".9"/>
+    <path d="m254 147 84 14v77l-84-14v-77Z" fill="#3A271B" stroke="url(#gold)" stroke-width="4"/>
+    <path d="m265 159 62 11v54l-62-11v-54Z" fill="#C79A63"/>
+    <circle cx="296" cy="188" r="17" fill="#546651"/>
+    <path d="m1100 117-111 20v98l111-14v-104Z" fill="#3A271B" stroke="url(#gold)" stroke-width="5"/>
+    <path d="m1087 131-84 15v71l84-11v-75Z" fill="#5A3440"/>
+    <path d="m1087 182-84 11v24l84-11v-24Z" fill="#D0A262" opacity=".92"/>
+    <path d="m946 147-84 14v77l84-11v-80Z" fill="#3A271B" stroke="url(#gold)" stroke-width="4"/>
+    <path d="m935 159-62 11v54l62-8v-57Z" fill="#4F5C63"/>
+    <circle cx="905" cy="190" r="17" fill="#B68155"/>
+  </g>
+
+  <!-- Pools of warm light and floating dust. -->
+  <ellipse class="beam" cx="235" cy="275" rx="180" ry="62" fill="url(#glow)" filter="url(#soft)"/>
+  <ellipse class="beam" cx="973" cy="273" rx="160" ry="55" fill="url(#glow)" filter="url(#soft)" style="animation-delay:-3s"/>
+  <g fill="#F2D7A4">
+    <circle class="dust" cx="214" cy="282" r="2"/><circle class="dust d2" cx="353" cy="240" r="1.8"/>
+    <circle class="dust d3" cx="921" cy="290" r="2"/><circle class="dust d2" cx="1015" cy="237" r="1.5"/>
+    <circle class="dust d3" cx="167" cy="205" r="1.5"/><circle class="dust" cx="1042" cy="190" r="2"/>
+  </g>
+  <g class="lamp" fill="#F4D7A3"><circle cx="145" cy="64" r="3"/><circle cx="1055" cy="64" r="3"/></g>
+  <circle cx="145" cy="64" r="23" fill="url(#glow)" class="lamp"/>
+  <circle cx="1055" cy="64" r="23" fill="url(#glow)" class="lamp delay"/>
+
+  <!-- Dark glass panel lets the title read over the illustrated space. -->
+  <path d="M344 0h512v430H344z" fill="#101511" fill-opacity=".66"/>
+  <path d="M374 65h52M774 65h52" stroke="#CDA96E" stroke-opacity=".8"/>
+  <text x="600" y="99" text-anchor="middle" fill="#D8BD8D" font-family="'Helvetica Neue',Arial,sans-serif" font-size="11" letter-spacing="5">A DIGITAL ART MUSEUM</text>
+  <text x="600" y="179" text-anchor="middle" fill="#F1EBDD" font-family="Georgia,'Times New Roman',serif" font-size="58" letter-spacing="1">Atelier</text>
+  <text x="600" y="237" text-anchor="middle" fill="#D6B77C" font-family="Georgia,'Times New Roman',serif" font-size="38" letter-spacing="9">MUSEUM</text>
+  <path d="M521 264h158" stroke="#CDA96E" stroke-opacity=".7"/>
+  <text x="600" y="300" text-anchor="middle" fill="#D5D3C9" font-family="'Helvetica Neue',Arial,sans-serif" font-size="13" letter-spacing="2">WALK IN. LOOK CLOSER.</text>
+  <text x="600" y="385" text-anchor="middle" fill="#D8BD8D" fill-opacity=".8" font-family="'Helvetica Neue',Arial,sans-serif" font-size="10" letter-spacing="3">WASD TO WALK  ·  MOUSE TO LOOK  ·  SPACE TO DISCOVER</text>
+  <rect x="1" y="1" width="1198" height="428" rx="21" stroke="#CDA96E" stroke-opacity=".32" stroke-width="2"/>
+</svg>
