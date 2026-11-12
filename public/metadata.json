@@ -1,102 +1,558 @@
 [
-  { "file": "01.jpg", "title": "Turquoise Parrot" },
-  { "file": "02.jpg", "title": "Floral Glitch" },
-  { "file": "03.jpg", "title": "Red Drop" },
-  { "file": "04.jpg", "title": "Golden Peaks" },
-  { "file": "05.jpg", "title": "Little Children on a Bicycle" },
-  { "file": "06.jpg", "title": "Abstract Flow" },
-  { "file": "07.jpg", "title": "Islamic Geometric Pattern" },
-  { "file": "08.jpg", "title": "Cygnus atratus" },
-  { "file": "09.jpg", "title": "Holi Portrait" },
-  { "file": "10.jpeg", "title": "Mona Lisa" },
-  { "file": "11.jpeg", "title": "La Barque" },
-  { "file": "12.jpeg", "title": "Cherry Tunnel" },
-  { "file": "13.jpeg", "title": "Rose Shoreline" },
-  { "file": "14.jpeg", "title": "George Roux" },
-  { "file": "15.jpeg", "title": "Dancing Duo" },
-  { "file": "16.jpeg", "title": "Portrait of a Man with a Pipe" },
-  { "file": "17.jpeg", "title": "Balcony by the Sea" },
-  { "file": "18.jpeg", "title": "Fire Sky Cabin" },
-  { "file": "19.jpeg", "title": "Profile with Laurel Wreath" },
-  { "file": "20.jpeg", "title": "Shattered Portrait" },
-  { "file": "21.jpeg", "title": "Smoking Duck" },
-  { "file": "22.jpeg", "title": "Impasto Cry" },
-  { "file": "23.jpeg", "title": "Sun King" },
-  { "file": "24.jpeg", "title": "Belle" },
-  { "file": "25.jpeg", "title": "The Lonely One" },
-  { "file": "26.jpeg", "title": "Cat and Mice" },
-  { "file": "27.jpeg", "title": "The Kiss by Gustav Klimt" },
-  { "file": "28.jpg", "title": "Starry Night by Vincent Van Gogh" },
-  { "file": "29.jpeg", "title": "Reflection" },
-  { "file": "30.jpeg", "title": "Sailboat sail in the ocean" },
-  { "file": "31.jpeg", "title": "Rural Scene By William Kay Blacklock" },
-  { "file": "32.jpeg", "title": "Depression" },
-  { "file": "33.jpeg", "title": "Celebrate International Earth Day" },
-  { "file": "34.jpeg", "title": "Abstract Embrace" },
-  { "file": "35.jpeg", "title": "Rainy Evening in a City Street" },
-  { "file": "36.jpeg", "title": "The Last Kiss" },
-  { "file": "37.jpeg", "title": "Moonlight Swing" },
-  { "file": "38.jpeg", "title": "The Last Judgment" },
-  { "file": "39.jpeg", "title": "Golden Bayou" },
-  { "file": "40.jpeg", "title": "The Smoker's Profile" },
-  { "file": "41.jpeg", "title": "Colored Rain" },
-  { "file": "42.jpeg", "title": "The Creator's Kiss" },
-  { "file": "43.jpeg", "title": "Ivy Ruins" },
-  { "file": "44.jpeg", "title": "Crimson Grid" },
-  { "file": "45.jpeg", "title": "Elegant Woman" },
-  { "file": "46.jpeg", "title": "Bring the warmth of autumn into your home" },
-  { "file": "47.jpeg", "title": "Construction by Burton Wasserman, 1950" },
-  { "file": "48.jpeg", "title": "Colorful Cat" },
-  { "file": "49.jpeg", "title": "SEELENVERWANDTE, KINDRED SPIRITS" },
-  { "file": "50.jpeg", "title": "El pintor que plasmó la historia de amor" },
-  { "file": "51.jpeg", "title": "Frederic William Burton's 'The Meeting on the Turret Stairs'" },
-  { "file": "52.jpeg", "title": "From a jellybean Queen to a Monarch" },
-  { "file": "53.jpeg", "title": "jaime corum" },
-  { "file": "54.jpeg", "title": "Lover's" },
-  { "file": "55.jpeg", "title": "Eclipse" },
-  { "file": "56.jpeg", "title": "The Familiar Spirit Companion to Witches" },
-  { "file": "57.jpeg", "title": "This is how I feel most of the time!" },
-  { "file": "58.jpeg", "title": "Vintage" },
-  { "file": "59.jpeg", "title": "Anxiety" },
-  { "file": "60.jpeg", "title": "In the Boudoir- Lucius Rossi" },
-  { "file": "61.jpeg", "title": "The Swing by Jean Honoré Fragonard, 1767" },
-  { "file": "62.jpeg", "title": "Fireside Melodies" },
-  { "file": "63.jpeg", "title": "The Bird's Whisper" },
-  { "file": "64.jpeg", "title": "The Light Bearer" },
-  { "file": "65.jpeg", "title": "Fountain of Light" },
-  { "file": "66.jpeg", "title": "The Golden Boudoir" },
-  { "file": "67.jpeg", "title": "Praying Hands" },
-  { "file": "68.jpeg", "title": "Rural Scene By William Kay Blacklock" },
-  { "file": "69.jpeg", "title": "Lady with Flowers - Leopold Schmutzler" },
-  { "file": "70.jpeg", "title": "The Swing - Jean-Honoré Fragonard, 1767" },
-  { "file": "71.jpeg", "title": "Princess Tarakanova by Konstantin Flavitsky" },
-  { "file": "72.jpeg", "title": "Old Guitarist by Pablo Picasso, 1903" },
-  { "file": "73.jpeg", "title": "Beautiful 'Sea Beach'" },
-  { "file": "74.jpeg", "title": "Portrait of William of Orange as a prince and his future bride Mary Stuart 17th century, Anthony van Dyck" },
-  { "file": "75.jpeg", "title": "Wildflower Field" },
-  { "file": "76.jpeg", "title": "La Reproduction Interdite by René Magritte (1937)" },
-  { "file": "77.jpeg", "title": "History of pearls by V&A Museum" },
-  { "file": "78.jpeg", "title": "Done With Life" },
-  { "file": "79.jpeg", "title": "Association Of Catholic Women Bloggers" },
-  { "file": "80.jpeg", "title": "Rural Scene By William Kay Blacklock" },
-  { "file": "81.jpeg", "title": "Victorian Art" },
-  { "file": "82.jpeg", "title": "The Bird's Whisper" },
-  { "file": "83.jpeg", "title": "Submerged" },
-  { "file": "84.jpeg", "title": "Rainy Evening in a City Street" },
-  { "file": "85.jpeg", "title": "Ophelia's Garden" },
-  { "file": "86.jpeg", "title": "The Dinner Plate" },
-  { "file": "87.jpeg", "title": "Stańczyk" },
-  { "file": "88.jpeg", "title": "Swan Study" },
-  { "file": "89.jpeg", "title": "The Cave Angel" },
-  { "file": "90.jpeg", "title": "The Milk Thief" },
-  { "file": "91.jpeg", "title": "The Three Ages of Woman" },
-  { "file": "92.jpeg", "title": "Water Nymphs" },
-  { "file": "93.jpeg", "title": "Roman Pines" },
-  { "file": "94.jpeg", "title": "The Inner City" },
-  { "file": "95.jpeg", "title": "Rising Moon" },
-  { "file": "96.jpeg", "title": "Wind-Up Doll" },
-  { "file": "97.jpeg", "title": "Meadow Dusk" },
-  { "file": "98.jpeg", "title": "The Blue Door" },
-  { "file": "99.jpeg", "title": "Forest Archway" },
-  { "file": "100.jpeg", "title": "Soft Bloom" }
+  {
+    "file": "111-kabali-da.jpg",
+    "title": "Kabali Da",
+    "description": "A poster-like portrait sets a composed figure against a fiery halo; the crown and bold lettering make this a tribute to screen presence.",
+    "aspectRatio": 0.9495
+  },
+  {
+    "file": "101-lion-and-lamb.jpg",
+    "title": "Lion and Lamb",
+    "description": "A lion and a small lamb share the frame, pairing raw strength with gentleness in a quiet image of unlikely peace."
+  },
+  {
+    "file": "102-spider-man-and-gwen.jpg",
+    "title": "Spider-Man and Gwen",
+    "description": "Close framing and warm reds give this Spider-Man and Gwen scene a tender, personal mood within a familiar superhero story."
+  },
+  {
+    "file": "103-wine-cat.jpg",
+    "title": "The Cat and the Glass",
+    "description": "A glass of red wine and a black cat form a playful still life, balancing a simple tabletop scene with sly humor."
+  },
+  {
+    "file": "104-portrait-of-a-smoker.jpg",
+    "title": "Portrait of a Smoker",
+    "description": "A seated smoker turns inward; the muted palette and relaxed pose give the portrait a reflective, unhurried character."
+  },
+  {
+    "file": "105-woman-by-the-window.jpg",
+    "title": "Woman by the Window",
+    "description": "A solitary figure stands beside a bright window; the contrast between pale light and dark interior makes the room contemplative."
+  },
+  {
+    "file": "106-heisenberg-portrait.jpg",
+    "title": "Heisenberg",
+    "description": "Bold poster colors and a direct gaze recast Heisenberg as an unmistakable pop-culture portrait."
+  },
+  {
+    "file": "107-black-cat-in-red.jpg",
+    "title": "Black Cat in Red",
+    "description": "A black cat sits against vivid red, its curved silhouette carrying the composition with graphic simplicity."
+  },
+  {
+    "file": "108-mother-and-child.jpg",
+    "title": "Mother and Child",
+    "description": "A tender mother-and-child portrait surrounded by flowers and soft color focuses on closeness and care."
+  },
+  {
+    "file": "109-red-bearded-portrait.jpg",
+    "title": "Red Bearded Portrait",
+    "description": "A rugged bearded face emerges from warm, rough brushwork, giving the portrait a weathered, expressive presence."
+  },
+  {
+    "file": "110-krishna-portrait.jpg",
+    "title": "Krishna in Color",
+    "description": "An expressive Krishna portrait uses saturated blues, greens, and gold to make the face feel devotional and contemporary."
+  },
+  {
+    "file": "01.jpg",
+    "title": "Turquoise Parrot",
+    "description": "A brightly colored parrot perches among delicate branches, combining natural-history detail with a lively wash of color."
+  },
+  {
+    "file": "02.jpg",
+    "title": "Floral Glitch",
+    "description": "Flowers and a fragmented portrait overlap in this digital collage, where crisp color bands interrupt organic forms."
+  },
+  {
+    "file": "03.jpg",
+    "title": "Red Drop",
+    "description": "A red drop hangs above a dark, luminous surface; the close-up turns a tiny moment into a dramatic study of color and motion."
+  },
+  {
+    "file": "04.jpg",
+    "title": "Golden Peaks",
+    "description": "Golden peaks rise above a cool, dusky landscape, with a small boat and glowing horizon adding scale to the scene."
+  },
+  {
+    "file": "05.jpg",
+    "title": "Little Children on a Bicycle",
+    "description": "Two children ride a bicycle through a sunlit landscape, rendered in loose brushwork that keeps the memory-like scene in motion."
+  },
+  {
+    "file": "06.jpg",
+    "title": "Abstract Flow",
+    "description": "Vertical ribbons of orange, yellow, blue, and green flow into one another, making color itself the subject of this abstract painting."
+  },
+  {
+    "file": "07.jpg",
+    "title": "Islamic Geometric Pattern",
+    "description": "Repeating stars and interlocking shapes build a precise geometric pattern inspired by Islamic design traditions."
+  },
+  {
+    "file": "08.jpg",
+    "title": "Cygnus atratus",
+    "description": "A black swan glides across still water, its curved neck and reflected form set against a restrained, pale background."
+  },
+  {
+    "file": "09.jpg",
+    "title": "Holi Portrait",
+    "description": "A face bursts into saturated greens, pinks, and violet, using color and texture to suggest the energy of a festival."
+  },
+  {
+    "file": "10.jpeg",
+    "title": "Mona Lisa",
+    "description": "Leonardo da Vinci’s sitter meets the viewer with a restrained expression, set against a softly hazed landscape."
+  },
+  {
+    "file": "11.jpeg",
+    "title": "La Barque",
+    "description": "A small boat and figures move across quiet water, with loose brushwork keeping the scene light and atmospheric."
+  },
+  {
+    "file": "12.jpeg",
+    "title": "Cherry Tunnel",
+    "description": "A narrow path winds beneath a canopy of cherry blossoms, drawing the eye toward a soft opening in the garden."
+  },
+  {
+    "file": "13.jpeg",
+    "title": "Rose Shoreline",
+    "description": "Foamy waves trace a curving edge across a rose-tinted shore, turning a coastline into a study of rhythm and pastel color."
+  },
+  {
+    "file": "14.jpeg",
+    "title": "George Roux",
+    "description": "A pale figure and interior furnishings emerge from a softly lit room, inviting a closer look at gesture and period detail."
+  },
+  {
+    "file": "15.jpeg",
+    "title": "Dancing Duo",
+    "description": "Two dancers turn toward one another in sweeping color, their long shapes and energetic strokes suggesting music and movement."
+  },
+  {
+    "file": "16.jpeg",
+    "title": "Portrait of a Man with a Pipe",
+    "description": "A graphite portrait studies an older man’s face with economical marks, leaving the paper visible around his thoughtful expression."
+  },
+  {
+    "file": "17.jpeg",
+    "title": "Balcony by the Sea",
+    "description": "An open balcony frames a bright sea and distant shore, contrasting ordered architecture with the spacious view beyond."
+  },
+  {
+    "file": "18.jpeg",
+    "title": "Fire Sky Cabin",
+    "description": "A small cabin sits beneath a dramatic red-orange sky, where the setting sun spreads color across water and land."
+  },
+  {
+    "file": "19.jpeg",
+    "title": "Profile with Laurel Wreath",
+    "description": "A classical profile wears a laurel wreath, its sculpted contours recalling the idealized portraiture of antiquity."
+  },
+  {
+    "file": "20.jpeg",
+    "title": "Shattered Portrait",
+    "description": "A face is fractured by a web of cracks and overlapping marks, turning portraiture into a striking image of disruption."
+  },
+  {
+    "file": "21.jpeg",
+    "title": "Smoking Duck",
+    "description": "A white duck with an orange bill faces forward; loose painterly marks give the familiar subject a curious personality."
+  },
+  {
+    "file": "22.jpeg",
+    "title": "Impasto Cry",
+    "description": "A single eye fills the canvas amid thick, tactile paint; layered strokes make the expression feel immediate and vulnerable."
+  },
+  {
+    "file": "23.jpeg",
+    "title": "Sun King",
+    "description": "A dark portrait floats within a swirling field of luminous color, suggesting a regal figure in a dreamlike space."
+  },
+  {
+    "file": "24.jpeg",
+    "title": "Belle",
+    "description": "A woman stands among flowers beneath a leafy arch, surrounded by decorative patterns that recall Art Nouveau."
+  },
+  {
+    "file": "25.jpeg",
+    "title": "The Lonely One",
+    "description": "A lone figure pauses beneath a tree at dusk, with mist and muted earth tones lending the landscape a solitary mood."
+  },
+  {
+    "file": "26.jpeg",
+    "title": "Cat and Mice",
+    "description": "A ginger cat sprawls across a tabletop while small mice gather nearby, turning a domestic scene into a playful standoff."
+  },
+  {
+    "file": "27.jpeg",
+    "title": "The Kiss by Gustav Klimt",
+    "description": "Gustav Klimt’s gold-patterned embrace surrounds two lovers, blending intimate human forms with shimmering ornament."
+  },
+  {
+    "file": "28.jpg",
+    "title": "Starry Night by Vincent Van Gogh",
+    "description": "Vincent van Gogh’s night sky sweeps around a quiet village, with cypress trees and stars carrying the painting’s restless motion."
+  },
+  {
+    "file": "29.jpeg",
+    "title": "Reflection",
+    "description": "A blurred figure dissolves into gray and charcoal tones, making uncertainty and shifting identity the focus of this portrait."
+  },
+  {
+    "file": "30.jpeg",
+    "title": "Sailboat sail in the ocean",
+    "description": "A sailboat crosses jewel-toned water beneath a glowing sky; the small vessel makes the surrounding seascape feel wide and open."
+  },
+  {
+    "file": "31.jpeg",
+    "title": "Rural Scene By William Kay Blacklock",
+    "description": "A quiet rural river bends through a tree-lined landscape, with soft reflections and open banks giving the scene a restful pace."
+  },
+  {
+    "file": "32.jpeg",
+    "title": "Depression",
+    "description": "An open mouth and tense face dominate this stark image, turning an inner struggle into a direct, unsettling expression."
+  },
+  {
+    "file": "33.jpeg",
+    "title": "Celebrate International Earth Day",
+    "description": "A decorative floral figure and butterflies celebrate the natural world, pairing an ornamental style with an environmental theme."
+  },
+  {
+    "file": "34.jpeg",
+    "title": "Abstract Embrace",
+    "description": "Two figures meet in vivid, gestural strokes; layered colors suggest intimacy while keeping the forms loose and expressive."
+  },
+  {
+    "file": "35.jpeg",
+    "title": "Rainy Evening in a City Street",
+    "description": "Rain, lamplight, and blurred pedestrians transform a city street into a shimmering evening scene of reflections and movement."
+  },
+  {
+    "file": "36.jpeg",
+    "title": "The Last Kiss",
+    "description": "Two figures share a final intimate moment indoors, their close gesture contrasting with the stillness of the surrounding room."
+  },
+  {
+    "file": "37.jpeg",
+    "title": "Moonlight Swing",
+    "description": "A swing and small figures sit beneath a glowing moon, turning a familiar pastime into a quiet nocturnal scene."
+  },
+  {
+    "file": "38.jpeg",
+    "title": "The Last Judgment",
+    "description": "A crowded biblical panorama fills the canvas with many small figures, inviting the eye to travel through its layered narrative."
+  },
+  {
+    "file": "39.jpeg",
+    "title": "Golden Bayou",
+    "description": "Trees and water meet in a richly toned wetland view, where reflections and warm light give the landscape its golden calm."
+  },
+  {
+    "file": "40.jpeg",
+    "title": "The Smoker's Profile",
+    "description": "A smoker’s profile is built from fine, deliberate marks, with the face and hand forming a compact study of gesture."
+  },
+  {
+    "file": "41.jpeg",
+    "title": "Colored Rain",
+    "description": "A lone figure beneath a colorful umbrella stands in a spare, dreamlike scene, with the rain rendered as flowing bands of color."
+  },
+  {
+    "file": "42.jpeg",
+    "title": "The Creator's Kiss",
+    "description": "An artist faces a canvas in a studio scene, making the act of creating and the relationship between painter and subject part of the image."
+  },
+  {
+    "file": "43.jpeg",
+    "title": "Ivy Ruins",
+    "description": "A weathered stone structure rises among ivy and trees, contrasting the permanence of architecture with the softness of overgrowth."
+  },
+  {
+    "file": "44.jpeg",
+    "title": "Crimson Grid",
+    "description": "Red, orange, and dark rectangular marks stack into a dense abstract grid, balancing structure with a hand-worked surface."
+  },
+  {
+    "file": "45.jpeg",
+    "title": "Elegant Woman",
+    "description": "A seated woman in ornate dress is surrounded by patterned foliage, giving this portrait a decorative, storybook presence."
+  },
+  {
+    "file": "46.jpeg",
+    "title": "Bring the warmth of autumn into your home",
+    "description": "An autumn scene gathers figures, trees, and seasonal color into a warm decorative image suited to close viewing."
+  },
+  {
+    "file": "47.jpeg",
+    "title": "Construction by Burton Wasserman, 1950",
+    "description": "Burton Wasserman’s geometric construction arranges blocks and curves into a crisp study of shape, balance, and color."
+  },
+  {
+    "file": "48.jpeg",
+    "title": "Colorful Cat",
+    "description": "A bright, wide-eyed cat faces the viewer, its simplified shapes and saturated colors giving the portrait a playful pop-art feel."
+  },
+  {
+    "file": "49.jpeg",
+    "title": "SEELENVERWANDTE, KINDRED SPIRITS",
+    "description": "A branching, jewel-colored tree fills the composition, making the idea of kindred spirits visible through a network of shared forms."
+  },
+  {
+    "file": "50.jpeg",
+    "title": "El pintor que plasmó la historia de amor",
+    "description": "Two figures sit together in a garden, their quiet conversation framed by the broader landscape around them."
+  },
+  {
+    "file": "51.jpeg",
+    "title": "Frederic William Burton's 'The Meeting on the Turret Stairs'",
+    "description": "Frederic William Burton captures a tender meeting on a narrow stair, where posture and a fleeting kiss carry the scene’s emotion."
+  },
+  {
+    "file": "52.jpeg",
+    "title": "From a jellybean Queen to a Monarch",
+    "description": "A queenly face emerges from a mosaic of bright fragments, mixing playful color with the formal presence of a monarch."
+  },
+  {
+    "file": "53.jpeg",
+    "title": "jaime corum",
+    "description": "A carefully rendered horse stands in a warm interior, with its posture and polished coat at the center of the composition."
+  },
+  {
+    "file": "54.jpeg",
+    "title": "Lover's",
+    "description": "Two lovers are brought together through broad, expressive color, allowing the shapes of the figures to flow into one another."
+  },
+  {
+    "file": "55.jpeg",
+    "title": "Eclipse",
+    "description": "A dark eclipse-like scene gathers the eye around a small source of light, balancing mystery with a strong central focus."
+  },
+  {
+    "file": "56.jpeg",
+    "title": "The Familiar Spirit Companion to Witches",
+    "description": "A black cat sits against a crescent moon, a simple nocturnal image with a folklore-inspired mood."
+  },
+  {
+    "file": "57.jpeg",
+    "title": "This is how I feel most of the time!",
+    "description": "A reclining figure and soft, warm colors turn this personal image into a quiet expression of fatigue and inward reflection."
+  },
+  {
+    "file": "58.jpeg",
+    "title": "Vintage",
+    "description": "A warmly lit interior and period furnishings surround a figure, with the room’s stillness lending the scene a nostalgic mood."
+  },
+  {
+    "file": "59.jpeg",
+    "title": "Anxiety",
+    "description": "A small figure faces a broad, unsettled landscape, using distance and muted tones to suggest anxiety and isolation."
+  },
+  {
+    "file": "60.jpeg",
+    "title": "In the Boudoir- Lucius Rossi",
+    "description": "A woman in a richly furnished boudoir is rendered in soft light, with costume and interior details establishing the setting."
+  },
+  {
+    "file": "61.jpeg",
+    "title": "The Swing by Jean Honoré Fragonard, 1767",
+    "description": "Jean-Honoré Fragonard’s famous swing arcs through a lush garden, catching a playful moment amid elaborate foliage."
+  },
+  {
+    "file": "62.jpeg",
+    "title": "Fireside Melodies",
+    "description": "A seated figure beside a fire and musical instruments creates an intimate scene shaped by warmth, rest, and music."
+  },
+  {
+    "file": "63.jpeg",
+    "title": "The Bird's Whisper",
+    "description": "A hand reaches toward a small bird, capturing a gentle pause between a person and the natural world."
+  },
+  {
+    "file": "64.jpeg",
+    "title": "The Light Bearer",
+    "description": "A figure raises a flame in a dark setting, making a small source of light the image’s symbolic center."
+  },
+  {
+    "file": "65.jpeg",
+    "title": "Fountain of Light",
+    "description": "A stone fountain anchors a sunlit garden, where water, architecture, and greenery create a balanced landscape."
+  },
+  {
+    "file": "66.jpeg",
+    "title": "The Golden Boudoir",
+    "description": "A gilded boudoir opens into a richly furnished interior, inviting attention to its reflective surfaces and ornamental detail."
+  },
+  {
+    "file": "67.jpeg",
+    "title": "Praying Hands",
+    "description": "Praying hands are held close and carefully rendered, focusing the image on devotion, gesture, and quiet concentration."
+  },
+  {
+    "file": "68.jpeg",
+    "title": "Rural Scene By William Kay Blacklock",
+    "description": "A calm stream winds beneath mature trees, with reflections and open banks creating a measured pastoral view."
+  },
+  {
+    "file": "69.jpeg",
+    "title": "Lady with Flowers - Leopold Schmutzler",
+    "description": "A woman holds a bouquet in soft light, with an elegant pose and delicate brushwork drawing attention to the flowers."
+  },
+  {
+    "file": "70.jpeg",
+    "title": "The Swing - Jean-Honoré Fragonard, 1767",
+    "description": "Fragonard’s swinging figure moves through a green garden, balancing playful motion with a carefully staged Rococo setting."
+  },
+  {
+    "file": "71.jpeg",
+    "title": "Princess Tarakanova by Konstantin Flavitsky",
+    "description": "Princess Tarakanova is confined in a dim cell as water rises around her, heightening the painting’s dramatic atmosphere."
+  },
+  {
+    "file": "72.jpeg",
+    "title": "Old Guitarist by Pablo Picasso, 1903",
+    "description": "Picasso’s elderly guitarist bends around his instrument, the blue palette and compressed pose giving the figure a mournful stillness."
+  },
+  {
+    "file": "73.jpeg",
+    "title": "Beautiful 'Sea Beach'",
+    "description": "A moonlit waterfront and small figure are set in cool blue, with lamps along the shore guiding the eye into the night."
+  },
+  {
+    "file": "74.jpeg",
+    "title": "Portrait of William of Orange as a prince and his future bride Mary Stuart 17th century, Anthony van Dyck",
+    "description": "A formal double portrait joins William of Orange and Mary Stuart, using costume and posture to mark their dynastic setting."
+  },
+  {
+    "file": "75.jpeg",
+    "title": "Wildflower Field",
+    "description": "Wildflowers spread across a pale meadow, with a low horizon and small blooms creating a gentle seasonal landscape."
+  },
+  {
+    "file": "76.jpeg",
+    "title": "La Reproduction Interdite by René Magritte (1937)",
+    "description": "Magritte’s man faces a mirror that reflects the back of his head, making the familiar act of looking feel uncanny."
+  },
+  {
+    "file": "77.jpeg",
+    "title": "History of pearls by V&A Museum",
+    "description": "A hand presents a pearl shell in close view, connecting the history of pearls with the natural material behind the ornament."
+  },
+  {
+    "file": "78.jpeg",
+    "title": "Done With Life",
+    "description": "A small cat lies curled on a red surface; its tired posture gives the title’s dark humor a surprisingly tender edge."
+  },
+  {
+    "file": "79.jpeg",
+    "title": "Association Of Catholic Women Bloggers",
+    "description": "A colorful, mosaic-like portrait combines small marks and bright patterns into a lively image of faith and community."
+  },
+  {
+    "file": "80.jpeg",
+    "title": "Rural Scene By William Kay Blacklock",
+    "description": "A broad riverbank opens beneath mature trees, with a low bridge and reflections giving this pastoral scene a measured calm."
+  },
+  {
+    "file": "81.jpeg",
+    "title": "Victorian Art",
+    "description": "A classical statue stands beside a tree, combining sculptural form with the leafy setting of a Victorian-inspired view."
+  },
+  {
+    "file": "82.jpeg",
+    "title": "The Bird's Whisper",
+    "description": "A hand and bird meet in a pale, painterly field, making a small gesture of trust the focus of the scene."
+  },
+  {
+    "file": "83.jpeg",
+    "title": "Submerged",
+    "description": "A face rises through bands of blue and green, its distorted expression suggesting emotional struggle beneath the water-like color."
+  },
+  {
+    "file": "84.jpeg",
+    "title": "Rainy Evening in a City Street",
+    "description": "Rain, lamps, and blurred figures turn a city street into a shimmering evening view of reflections and movement."
+  },
+  {
+    "file": "85.jpeg",
+    "title": "Ophelia's Garden",
+    "description": "Ophelia rests among flowers and water lilies, with dark foliage echoing the beauty and tragedy of the literary subject."
+  },
+  {
+    "file": "86.jpeg",
+    "title": "The Dinner Plate",
+    "description": "A decorative plate frames a miniature world of figures and landscape, bringing narrative detail into an everyday object."
+  },
+  {
+    "file": "87.jpeg",
+    "title": "Stańczyk",
+    "description": "Stańczyk sits apart from the court’s celebration, his pensive pose turning the jester into a witness to public trouble."
+  },
+  {
+    "file": "88.jpeg",
+    "title": "Swan Study",
+    "description": "A white swan floats on dark water, its reflected silhouette and ripples creating a restrained study of stillness."
+  },
+  {
+    "file": "89.jpeg",
+    "title": "The Cave Angel",
+    "description": "A luminous winged figure rises through a turbulent, cave-like sky, combining stormy atmosphere with an angelic presence."
+  },
+  {
+    "file": "90.jpeg",
+    "title": "The Milk Thief",
+    "description": "A cat reaches toward milk in a bright kitchen scene, while nearby figures make the small theft feel like a domestic story."
+  },
+  {
+    "file": "91.jpeg",
+    "title": "The Three Ages of Woman",
+    "description": "Klimt brings infancy, adulthood, and old age together in a tender, richly patterned meditation on the passage of time."
+  },
+  {
+    "file": "92.jpeg",
+    "title": "Water Nymphs",
+    "description": "Pale water nymphs move through a cold blue cascade, their sculptural forms blending into the flow of the waterfall."
+  },
+  {
+    "file": "93.jpeg",
+    "title": "Roman Pines",
+    "description": "Pines rise above a distant landscape in restrained monochrome, where expressive marks describe both trees and atmosphere."
+  },
+  {
+    "file": "94.jpeg",
+    "title": "The Inner City",
+    "description": "A tiny figure sits within concentric rings of vivid pattern, turning the city into a colorful map of movement and scale."
+  },
+  {
+    "file": "95.jpeg",
+    "title": "Rising Moon",
+    "description": "A low moon hangs over a quiet marsh, with reflections and distant trees giving the evening landscape a gentle glow."
+  },
+  {
+    "file": "96.jpeg",
+    "title": "Wind-Up Doll",
+    "description": "A poised figure leans beside a classical column, the still pose and pale dress lending the scene a theatrical mood."
+  },
+  {
+    "file": "97.jpeg",
+    "title": "Meadow Dusk",
+    "description": "A broad meadow fades into evening light, with distant trees and muted color stretching the landscape toward the horizon."
+  },
+  {
+    "file": "98.jpeg",
+    "title": "The Blue Door",
+    "description": "A child stands before a blue doorway, where patterned architecture and strong vertical lines frame a moment of curiosity."
+  },
+  {
+    "file": "99.jpeg",
+    "title": "Forest Archway",
+    "description": "A leafy arch opens onto a sunlit path, inviting the viewer into a lush, imagined garden."
+  },
+  {
+    "file": "100.jpeg",
+    "title": "Soft Bloom",
+    "description": "A vase of soft pink flowers gathers light against a pale background, turning a familiar still life into a gentle study of color."
+  }
 ]

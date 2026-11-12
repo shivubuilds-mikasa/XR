@@ -1,5 +1,7 @@
 import * as THREE from 'three';
-import type { ArtworkMeta } from './types';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
+import type { ArtworkMeta, GalleryExhibit } from './types';
 
 type ArtworkDisplay = {
   meta: ArtworkMeta;
@@ -261,13 +263,13 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     ring.rotation.set(0.7 + i * 0.46, i * 0.75, 0.15);
     scene.add(ring);
   }
-  const sculpture = new THREE.Mesh(
+  const atriumSculpture = new THREE.Mesh(
     new THREE.IcosahedronGeometry(0.42, 1),
     new THREE.MeshStandardMaterial({ color: 0x98a98d, roughness: 0.27, metalness: 0.48 }),
   );
-  sculpture.castShadow = true;
-  sculpture.position.set(0, 1.65, 0);
-  scene.add(sculpture);
+  atriumSculpture.castShadow = false;
+  atriumSculpture.position.set(0, 1.65, 0);
+  scene.add(atriumSculpture);
   const shadowCanvas = document.createElement('canvas');
   shadowCanvas.width = shadowCanvas.height = 128;
   const shadowContext = shadowCanvas.getContext('2d')!;
@@ -284,8 +286,8 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   softShadow.position.set(0, -0.055, 0);
   scene.add(softShadow);
 
-  const ambient = new THREE.HemisphereLight(0xfff4df, 0x26372d, 3.0);
-  const key = new THREE.DirectionalLight(0xffe8c8, 3.2);
+  const ambient = new THREE.HemisphereLight(0xfff4df, 0x26372d, 1.8);
+  const key = new THREE.DirectionalLight(0xffe8c8, 2.2);
   key.position.set(-7, 13, 5);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
@@ -298,12 +300,20 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   key.shadow.camera.updateProjectionMatrix();
   key.shadow.bias = -0.00012;
   key.shadow.normalBias = 0.015;
-  const fill = new THREE.DirectionalLight(0xbdd2d8, 0.75);
+  const fill = new THREE.DirectionalLight(0xbdd2d8, 0.48);
   fill.position.set(8, 7, -8);
   scene.add(ambient, key, fill);
 
+  // Warm pools of light make each wing feel like its own room while keeping
+  // the lighting cost low: these lights do not cast additional shadow maps.
+  for (const room of rooms) {
+    const light = new THREE.PointLight(0xffd9a4, room.name === 'The Atrium' ? 34 : 24, 27, 2);
+    light.position.set((room.x0 + room.x1) / 2, WALL_HEIGHT - 0.9, (room.z0 + room.z1) / 2);
+    scene.add(light);
+  }
+
   function addArtwork(meta: ArtworkMeta, index: number, x: number, z: number, yaw: number) {
-    const aspect = [1.16, 0.8, 1, 0.9, 1.22, 0.72, 1, 0.84][index % 8];
+    const aspect = meta.aspectRatio ?? [1.16, 0.8, 1, 0.9, 1.22, 0.72, 1, 0.84][index % 8];
     // Monumental salon-scale canvases read clearly from the atrium while
     // retaining the source artwork's aspect ratio.
     const height = aspect >= 1 ? 3.25 : 3.45;
@@ -332,7 +342,7 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     const hitArea = new THREE.Mesh(hitGeometry, hitMaterial);
     hitArea.scale.set(width + 0.34, height + 0.34, 1);
     hitArea.position.z = 0.13;
-    hitArea.userData['artwork'] = meta;
+    hitArea.userData['exhibit'] = { kind: 'artwork', artwork: meta } satisfies GalleryExhibit;
     group.add(hitArea);
     imageTargets.push(hitArea);
 
@@ -363,7 +373,8 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   for (const z of [-8, -2.7, 2.7, 8]) addNext(-39.72, z, Math.PI / 2);
   for (const x of westWallXs) { addNext(x, -11.72, 0); addNext(x, 11.72, Math.PI); }
   for (const z of [-8, -2.7, 2.7, 8]) addNext(39.72, z, -Math.PI / 2);
-  for (const x of [-34, -20]) { addNext(x, -11.72, 0); addNext(x, 11.72, Math.PI); }
+  // The east wing mirrors the west wing; keep each work on its own wall slot.
+  for (const x of [20, 34]) { addNext(x, -11.72, 0); addNext(x, 11.72, Math.PI); }
 
   // Small wall sconces use emissive surfaces instead of expensive point lights.
   for (const room of rooms.slice(1)) {
@@ -405,10 +416,94 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
       : new THREE.DodecahedronGeometry(0.48, 0);
     const sculpture = new THREE.Mesh(form, wingSculptureMaterials[index]);
     sculpture.position.set(x, 1.66, z);
-    sculpture.castShadow = true;
+    sculpture.castShadow = false;
     scene.add(sculpture);
     wingSculptures.push(sculpture);
   });
+
+  // Real collection sculptures replace the procedural placeholders as the
+  // visitor approaches each wing. The shipped GLBs are simplified and
+  // meshopt-compressed; load and decode one at a time to protect frame pacing.
+  const statueSpecs = [
+    { file: 'cesar_-_louvre_museum.glb', title: 'Classical Bust', description: 'A three-dimensional portrait in the classical Roman tradition, with carved features and a close-cropped bust form that rewards a slow turn around the pedestal.', x: 0, z: -25, height: 2.15, baseY: 1.2, fallbackIndex: 0 },
+    { file: 'cleopatra_art_noveau_sculpture.glb', title: 'Cleopatra', description: 'An Art Nouveau take on Cleopatra, pairing a portrait subject with flowing decorative lines and an elegant, sculptural silhouette.', x: 0, z: 25, height: 2.15, baseY: 1.2, fallbackIndex: 1 },
+    { file: 'ship_in_a_bottle.glb', title: 'Ship in a Bottle', description: 'A miniature sailing ship sits inside a glass bottle, bringing rigging, hull, and delicate model-making into one compact object. Displayed in the West Gallery.', x: -26.5, z: 0, height: 1.25, baseY: 1.2, fallbackIndex: 2 },
+    { file: 'tete_dhomme_barbu_coiffe_dun_turban.glb', title: 'Bearded Man with a Turban', description: 'A sculpted head study of a bearded man, where the wrapped turban and carefully modelled features give the portrait its strong outline.', x: 26.5, z: 0, height: 2.15, baseY: 1.2, fallbackIndex: 3 },
+  ];
+  const statues = statueSpecs.map((spec) => ({
+    ...spec,
+    loading: false,
+    loaded: false,
+  }));
+  let statueLoads = 0;
+  const modelPreviews = new Map<string, THREE.Object3D>();
+
+  const loadStatue = (statue: typeof statues[number]) => {
+    statue.loading = true;
+    statueLoads++;
+    const finish = () => {
+      statue.loading = false;
+      statue.loaded = true;
+      statueLoads--;
+      onAssetReady();
+    };
+    const loader = new GLTFLoader();
+    loader.setMeshoptDecoder(MeshoptDecoder);
+    loader.load(`${BASE}models/featured/${statue.file}`, (gltf) => {
+      const model = gltf.scene;
+      modelPreviews.set(statue.file, model.clone(true));
+      const bounds = new THREE.Box3().setFromObject(model);
+      const size = bounds.getSize(new THREE.Vector3());
+      const height = Math.max(size.y, size.x, size.z);
+      const scale = statue.height / Math.max(height, 0.001);
+      const center = bounds.getCenter(new THREE.Vector3());
+      model.scale.setScalar(scale);
+      model.position.set(
+        statue.x - center.x * scale,
+        statue.baseY - bounds.min.y * scale,
+        statue.z - center.z * scale,
+      );
+      model.traverse((part) => {
+        if (part instanceof THREE.Mesh) {
+          part.castShadow = false;
+          part.receiveShadow = false;
+          part.frustumCulled = true;
+        }
+      });
+      scene.add(model);
+      const targetWidth = Math.max(size.x * scale * 1.2, 0.85);
+      const targetHeight = Math.max(size.y * scale * 1.2, 1.2);
+      const targetDepth = Math.max(size.z * scale * 1.2, 0.85);
+      const hitArea = new THREE.Mesh(
+        new THREE.BoxGeometry(targetWidth, targetHeight, targetDepth),
+        hitMaterial,
+      );
+      hitArea.position.set(statue.x, statue.baseY + targetHeight / 2, statue.z);
+      const exhibit: GalleryExhibit = {
+        kind: 'model',
+        file: statue.file,
+        title: statue.title,
+        description: statue.description,
+      };
+      hitArea.userData['exhibit'] = exhibit;
+      imageTargets.push(hitArea);
+      scene.add(hitArea);
+      if (statue.fallbackIndex >= 0) {
+        const fallback = wingSculptures[statue.fallbackIndex];
+        scene.remove(fallback);
+        fallback.geometry.dispose();
+        (fallback.material as THREE.Material).dispose();
+      } else {
+        scene.remove(atriumSculpture);
+        atriumSculpture.geometry.dispose();
+        (atriumSculpture.material as THREE.Material).dispose();
+      }
+      finish();
+    }, undefined, (error) => {
+      console.warn(`Statue model could not be loaded: ${statue.file}`, error);
+      finish();
+    });
+  };
 
   // A sparse, low-cost dust field catches the gallery light.
   const dustCount = 88;
@@ -457,6 +552,10 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
 
   let textureLoads = 0;
   const loadNearbyArt = (position: THREE.Vector3): boolean => {
+    const nearbyStatue = statues.find((statue) => !statue.loading && !statue.loaded &&
+      Math.hypot(statue.x - position.x, statue.z - position.z) < (statue.fallbackIndex < 0 ? 24 : 30));
+    if (nearbyStatue && statueLoads === 0) loadStatue(nearbyStatue);
+
     const nearby = displays
       .filter((display) => !display.loading && !display.loaded && display.position.distanceToSquared(position) < 24 * 24)
       .sort((a, b) => a.position.distanceToSquared(position) - b.position.distanceToSquared(position))
@@ -483,7 +582,7 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
         })
         .finally(() => { display.loading = false; textureLoads--; });
     }
-    return textureLoads > 0 || nearby.length > 0 || displays.some((display) =>
+    return statueLoads > 0 || textureLoads > 0 || nearby.length > 0 || displays.some((display) =>
       !display.loading && !display.loaded && display.position.distanceToSquared(position) < 24 * 24,
     );
   };
@@ -495,5 +594,8 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     rooms,
     loadNearbyArt,
     animateDetails,
+    getModelPreview(file: string) {
+      return modelPreviews.get(file)?.clone(true) ?? null;
+    },
   };
 }

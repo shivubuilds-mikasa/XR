@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import type { ArtworkMeta } from './types';
+import type { GalleryExhibit } from './types';
 
 const WALKABLE = (x: number, z: number) =>
   (Math.abs(x) < 12.65 && Math.abs(z) < 37.65) ||
@@ -10,9 +10,10 @@ export function createControls(
   canvas: HTMLCanvasElement,
   colliders: THREE.Box3[],
   artworkTargets: THREE.Object3D[],
-  onFocus: (artwork: ArtworkMeta | null) => void,
+  onFocus: (exhibit: GalleryExhibit | null) => void,
   onLockChange: (locked: boolean) => void,
   onWake: () => void,
+  onOpenDetails: (exhibit: GalleryExhibit) => void,
 ) {
   const keys = new Set<string>();
   const raycaster = new THREE.Raycaster();
@@ -25,7 +26,8 @@ export function createControls(
   let locked = false;
   let active = false;
   let lastRaycast = 0;
-  let focused: ArtworkMeta | null = null;
+  let focused: GalleryExhibit | null = null;
+  let detailOpen = false;
   let forceRaycast = false;
 
   const updateRotation = () => { camera.rotation.set(pitch, yaw, 0, 'YXZ'); };
@@ -43,7 +45,7 @@ export function createControls(
   };
 
   const onMouseMove = (event: MouseEvent) => {
-    if (!active) return;
+    if (!active || detailOpen) return;
     yaw -= event.movementX * 0.0021;
     pitch = THREE.MathUtils.clamp(pitch - event.movementY * 0.0021, -1.38, 1.38);
     updateRotation();
@@ -62,6 +64,19 @@ export function createControls(
       return;
     }
     if (!active) return;
+    if (event.code === 'Space') {
+      event.preventDefault();
+      if (focused && !detailOpen) {
+        detailOpen = true;
+        keys.clear();
+        velocity.set(0, 0, 0);
+        onOpenDetails(focused);
+        if (document.pointerLockElement === canvas) document.exitPointerLock();
+        onWake();
+      }
+      return;
+    }
+    if (detailOpen) return;
     if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.code)) {
       event.preventDefault();
       keys.add(event.code);
@@ -85,8 +100,11 @@ export function createControls(
   const inspectCenter = () => {
     raycaster.setFromCamera(center, camera);
     const hit = raycaster.intersectObjects(artworkTargets, false)[0];
-    const next = (hit?.object.userData['artwork'] as ArtworkMeta | undefined) ?? null;
-    if (next?.file !== focused?.file) {
+    const next = (hit?.object.userData['exhibit'] as GalleryExhibit | undefined) ?? null;
+    const key = (exhibit: GalleryExhibit | null) => exhibit
+      ? `${exhibit.kind}:${exhibit.kind === 'artwork' ? exhibit.artwork.file : exhibit.file}`
+      : null;
+    if (key(next) !== key(focused)) {
       focused = next;
       onFocus(next);
     }
@@ -103,6 +121,7 @@ export function createControls(
   };
 
   const onCanvasClick = () => {
+    if (detailOpen) return;
     if (!active) { enterGallery(); return; }
     inspectCenter();
     if (focused) onFocus(focused);
@@ -117,8 +136,14 @@ export function createControls(
 
   return {
     enter: enterGallery,
+    closeDetails() {
+      detailOpen = false;
+      focused = null;
+      onFocus(null);
+      onWake();
+    },
     update(dt: number, now: number): boolean {
-      if (!active) return false;
+      if (!active || detailOpen) return false;
       const x = (keys.has('KeyD') || keys.has('ArrowRight') ? 1 : 0) -
         (keys.has('KeyA') || keys.has('ArrowLeft') ? 1 : 0);
       const z = (keys.has('KeyS') || keys.has('ArrowDown') ? 1 : 0) -

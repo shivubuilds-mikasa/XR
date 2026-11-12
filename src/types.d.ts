@@ -4,7 +4,19 @@ export type ArtworkMeta = {
   author?: string;
   year?: string;
   description?: string;
+  aspectRatio?: number;
 };
+
+export type GalleryExhibit =
+  | { kind: 'artwork'; artwork: ArtworkMeta }
+  | {
+      kind: 'model';
+      file: string;
+      title: string;
+      author?: string;
+      year?: string;
+      description: string;
+    };
 
 export type Bounds = {
   minX: number; maxX: number;

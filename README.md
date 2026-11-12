@@ -72,6 +72,7 @@ Smooth first-person movement with `W` `A` `S` `D` and mouse look, with instant p
 | <kbd>S</kbd> | Move backward |
 | <kbd>D</kbd> | Strafe right |
 | 🖱️ **Mouse** | Look around |
+| <kbd>Space</kbd> | Open the focused painting or sculpture details |
 | <kbd>Esc</kbd> | Pause and release the pointer |
 | 🖱️ **Click the scene** | Resume exploring |
 | 👁️ **Look at a painting** | See its title and artist |
