@@ -1,3 +1,4 @@
+import * as THREE from 'three';
 import type { GalleryExhibit } from './types';
 
 const BASE = import.meta.env.BASE_URL;
@@ -6,6 +7,8 @@ export function createUI(
   onEnter: () => void,
   onModelPreview: (file: string, canvas: HTMLCanvasElement) => void,
   onDetailsClosed: () => void,
+  camera: THREE.PerspectiveCamera,
+  getModelPreview: (file: string) => THREE.Object3D | null,
 ) {
   const shell = document.createElement('div');
   shell.className = 'ui-shell';
@@ -96,6 +99,35 @@ export function createUI(
   const detailImage = shell.querySelector<HTMLImageElement>('#detail-art-image')!;
   const modelStage = shell.querySelector<HTMLElement>('#detail-model-stage')!;
   const modelCanvas = shell.querySelector<HTMLCanvasElement>('#detail-model-canvas')!;
+  const xrInfoCanvas = document.createElement('canvas');
+  xrInfoCanvas.width = 768;
+  xrInfoCanvas.height = 900;
+  const xrInfoContext = xrInfoCanvas.getContext('2d')!;
+  const xrInfoTexture = new THREE.CanvasTexture(xrInfoCanvas);
+  xrInfoTexture.colorSpace = THREE.SRGBColorSpace;
+  const xrInfoMesh = new THREE.Mesh(new THREE.PlaneGeometry(1.14, 1.34), new THREE.MeshBasicMaterial({ map: xrInfoTexture, toneMapped: false }));
+  xrInfoMesh.position.set(0.55, 0, -2.05);
+  const xrImageCanvas = document.createElement('canvas');
+  xrImageCanvas.width = 540;
+  xrImageCanvas.height = 760;
+  const xrImageTexture = new THREE.CanvasTexture(xrImageCanvas);
+  xrImageTexture.colorSpace = THREE.SRGBColorSpace;
+  const xrImageMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.78, 1.1), new THREE.MeshBasicMaterial({ map: xrImageTexture, toneMapped: false }));
+  xrImageMesh.position.set(-0.43, 0, -2.02);
+  const xrModelBackdrop = new THREE.Mesh(new THREE.PlaneGeometry(0.78, 1.1), new THREE.MeshBasicMaterial({ color: 0x222b24, toneMapped: false }));
+  xrModelBackdrop.position.copy(xrImageMesh.position);
+  xrModelBackdrop.position.z -= 0.015;
+  const xrModelLabelCanvas = document.createElement('canvas');
+  xrModelLabelCanvas.width = 540;
+  xrModelLabelCanvas.height = 760;
+  const xrModelLabelTexture = new THREE.CanvasTexture(xrModelLabelCanvas);
+  xrModelLabelTexture.colorSpace = THREE.SRGBColorSpace;
+  const xrModelLabel = new THREE.Mesh(new THREE.PlaneGeometry(0.78, 1.1), new THREE.MeshBasicMaterial({ map: xrModelLabelTexture, transparent: true, toneMapped: false }));
+  xrModelLabel.position.copy(xrImageMesh.position);
+  xrModelLabel.position.z += 0.008;
+  camera.add(xrInfoMesh, xrImageMesh, xrModelBackdrop, xrModelLabel);
+  xrInfoMesh.visible = xrImageMesh.visible = xrModelBackdrop.visible = xrModelLabel.visible = false;
+  let xrModelPreview: THREE.Object3D | null = null;
   const detailTitle = shell.querySelector<HTMLElement>('#detail-title')!;
   const detailByline = shell.querySelector<HTMLElement>('#detail-byline')!;
   const detailDescription = shell.querySelector<HTMLElement>('#detail-description')!;
@@ -112,6 +144,91 @@ export function createUI(
   let kabaliAnalyser: AnalyserNode | null = null;
   let kabaliAudioSource: MediaElementAudioSourceNode | null = null;
   let kabaliBeatFrame = 0;
+  let xrKabaliPulse = 0;
+  let xrKabaliDirection = 1;
+
+  const wrapText = (context: CanvasRenderingContext2D, value: string, x: number, y: number, maxWidth: number, lineHeight: number, maxLines: number) => {
+    const words = value.split(/\s+/);
+    let line = '';
+    let lines = 0;
+    for (const word of words) {
+      const next = line ? `${line} ${word}` : word;
+      if (context.measureText(next).width > maxWidth && line) {
+        context.fillText(line, x, y + lines * lineHeight);
+        lines++;
+        line = word;
+        if (lines >= maxLines) break;
+      } else line = next;
+    }
+    if (line && lines < maxLines) context.fillText(line, x, y + lines * lineHeight);
+  };
+
+  const drawXRInfo = (kicker: string, titleText: string, byline: string, description: string, medium: string, year: string) => {
+    const context = xrInfoContext;
+    context.clearRect(0, 0, xrInfoCanvas.width, xrInfoCanvas.height);
+    context.fillStyle = '#151c17';
+    context.fillRect(0, 0, xrInfoCanvas.width, xrInfoCanvas.height);
+    context.strokeStyle = 'rgba(205,169,110,.62)';
+    context.lineWidth = 2;
+    context.strokeRect(18, 18, xrInfoCanvas.width - 36, xrInfoCanvas.height - 36);
+    context.fillStyle = '#d5b77f';
+    context.font = '18px Arial';
+    context.letterSpacing = '3px';
+    context.fillText(kicker.toUpperCase(), 54, 84);
+    context.fillStyle = '#f0eadf';
+    context.font = 'bold 42px Georgia';
+    context.letterSpacing = '0px';
+    wrapText(context, titleText, 54, 156, 650, 51, 2);
+    context.fillStyle = '#c8b48f';
+    context.font = '22px Arial';
+    wrapText(context, byline, 54, 268, 650, 30, 2);
+    context.strokeStyle = 'rgba(205,169,110,.58)';
+    context.beginPath();
+    context.moveTo(54, 342);
+    context.lineTo(710, 342);
+    context.stroke();
+    context.fillStyle = '#e0ddd4';
+    context.font = '24px Arial';
+    wrapText(context, description, 54, 402, 650, 38, 7);
+    context.fillStyle = '#d5b77f';
+    context.font = '16px Arial';
+    context.letterSpacing = '2px';
+    context.fillText('MEDIUM', 54, 750);
+    context.fillText('DATE', 400, 750);
+    context.fillStyle = '#f0eadf';
+    context.font = '22px Arial';
+    context.letterSpacing = '0px';
+    context.fillText(medium, 54, 793);
+    context.fillText(year, 400, 793);
+    context.fillStyle = '#b8b5aa';
+    context.font = '16px Arial';
+    context.fillText('TRIGGER TO RETURN  ·  GRIP + THUMBSTICK TO MOVE', 54, 846);
+    xrInfoTexture.needsUpdate = true;
+  };
+
+  const drawXRArtwork = (image: HTMLImageElement | null) => {
+    const context = xrImageCanvas.getContext('2d')!;
+    context.fillStyle = '#252a24';
+    context.fillRect(0, 0, xrImageCanvas.width, xrImageCanvas.height);
+    if (image?.complete && image.naturalWidth) {
+      const scale = Math.max(xrImageCanvas.width / image.naturalWidth, xrImageCanvas.height / image.naturalHeight);
+      const width = image.naturalWidth * scale;
+      const height = image.naturalHeight * scale;
+      context.drawImage(image, (xrImageCanvas.width - width) / 2, (xrImageCanvas.height - height) / 2, width, height);
+    } else {
+      context.fillStyle = '#d5b77f';
+      context.font = '24px Arial';
+      context.textAlign = 'center';
+      context.fillText('THREE-DIMENSIONAL STUDY', xrImageCanvas.width / 2, xrImageCanvas.height / 2);
+      context.textAlign = 'left';
+    }
+    xrImageTexture.needsUpdate = true;
+  };
+
+  const clearXRModel = () => {
+    if (xrModelPreview) camera.remove(xrModelPreview);
+    xrModelPreview = null;
+  };
 
   const stopKabaliBeatSync = () => {
     if (kabaliBeatFrame) cancelAnimationFrame(kabaliBeatFrame);
@@ -159,6 +276,8 @@ export function createUI(
       } else {
         pulse *= Math.exp(-elapsed / 0.15);
       }
+      xrKabaliPulse = pulse;
+      xrKabaliDirection = direction;
       baseline += (bass - baseline) * 0.035;
       detailImage.style.setProperty('--kabali-beat-x', `${(direction * pulse * 8).toFixed(2)}px`);
       detailImage.style.setProperty('--kabali-beat-y', `${(-pulse * 3.5).toFixed(2)}px`);
@@ -200,6 +319,12 @@ export function createUI(
     detailPanel.setAttribute('aria-hidden', 'true');
     shell.classList.remove('detail-open');
     shell.classList.remove('kabali-entry');
+    xrInfoMesh.visible = false;
+    xrImageMesh.visible = false;
+    xrModelBackdrop.visible = false;
+    xrModelLabel.visible = false;
+    clearXRModel();
+    xrKabaliPulse = 0;
     onDetailsClosed();
     onEnter();
   };
@@ -277,23 +402,76 @@ export function createUI(
       detailMedium.textContent = artwork ? 'Artwork on canvas' : 'Digital 3D model';
       detailYear.textContent = artwork?.year || 'Not recorded';
       detailMediaIndex.textContent = artwork ? 'PERMANENT COLLECTION' : 'ROTATING 3D VIEW';
+      const xrTitle = artwork ? artwork.title || artwork.file : exhibit.kind === 'model' ? exhibit.title : 'Untitled';
+      const xrByline = artwork?.author || (exhibit.kind === 'model' ? 'Three-dimensional collection object' : 'Artist not recorded');
+      const xrDescription = artwork?.description ||
+        (exhibit.kind === 'model' ? exhibit.description : 'This work is part of the permanent collection. Take a closer look and discover its details.');
+      drawXRInfo(artwork ? 'Collection / Artwork' : 'Sculpture / 3D study', xrTitle, xrByline, xrDescription, artwork ? 'Artwork on canvas' : 'Digital 3D model', artwork?.year || 'Not recorded');
+      xrInfoMesh.visible = true;
+      xrImageMesh.visible = false;
+      xrModelBackdrop.visible = false;
+      xrModelLabel.visible = false;
+      clearXRModel();
       if (artwork) {
         modelStage.hidden = true;
         detailImage.hidden = false;
         detailImage.src = `${BASE}images/${encodeURIComponent(artwork.file)}`;
         detailImage.alt = titleText;
+        drawXRArtwork(null);
+        xrImageMesh.visible = true;
+        const xrArtworkImage = new Image();
+        xrArtworkImage.onload = () => {
+          if (shell.classList.contains('detail-open') && xrImageMesh.visible) drawXRArtwork(xrArtworkImage);
+        };
+        xrArtworkImage.src = `${BASE}images/${encodeURIComponent(artwork.file)}`;
         if (artwork.file === '111-kabali-da.jpg') {
           playKabaliMusic();
         }
       } else if (exhibit.kind === 'model') {
         detailImage.hidden = true;
         modelStage.hidden = false;
-        onModelPreview(exhibit.file, modelCanvas);
+        if (!camera.userData['xrPresenting']) onModelPreview(exhibit.file, modelCanvas);
+        drawXRArtwork(null);
+        xrModelBackdrop.visible = true;
+        xrModelLabel.visible = true;
+        const labelContext = xrModelLabelCanvas.getContext('2d')!;
+        labelContext.clearRect(0, 0, xrModelLabelCanvas.width, xrModelLabelCanvas.height);
+        labelContext.fillStyle = '#d5b77f';
+        labelContext.font = '20px Arial';
+        labelContext.textAlign = 'center';
+        labelContext.fillText('3D COLLECTION OBJECT', xrModelLabelCanvas.width / 2, 700);
+        labelContext.fillText('TRIGGER TO CLOSE', xrModelLabelCanvas.width / 2, 738);
+        xrModelLabelTexture.needsUpdate = true;
+        xrModelPreview = getModelPreview(exhibit.file);
+        if (xrModelPreview) {
+          const bounds = new THREE.Box3().setFromObject(xrModelPreview);
+          const size = bounds.getSize(new THREE.Vector3());
+          const center = bounds.getCenter(new THREE.Vector3());
+          const scale = 0.72 / Math.max(size.x, size.y, size.z, 0.001);
+          xrModelPreview.scale.setScalar(scale);
+          xrModelPreview.position.set(-center.x * scale - 0.43, -center.y * scale, -2.0 - center.z * scale);
+          camera.add(xrModelPreview);
+        }
       }
       detailBackdrop.classList.add('detail-visible');
       detailPanel.setAttribute('aria-hidden', 'false');
       shell.classList.add('detail-open');
       shell.querySelector<HTMLButtonElement>('#detail-close')!.focus();
     },
+    animateXR(dt: number) {
+      if (xrModelPreview && shell.classList.contains('detail-open')) xrModelPreview.rotation.y += dt * 0.35;
+      if (shell.classList.contains('kabali-entry')) {
+        xrImageMesh.position.x = -0.43 + xrKabaliDirection * xrKabaliPulse * 0.055;
+        xrImageMesh.position.y = -xrKabaliPulse * 0.024;
+        xrImageMesh.rotation.z = xrKabaliDirection * xrKabaliPulse * 0.018;
+        const scale = 1 + xrKabaliPulse * 0.045;
+        xrImageMesh.scale.set(scale, scale, 1);
+      } else {
+        xrImageMesh.position.set(-0.43, 0, -2.02);
+        xrImageMesh.rotation.z = 0;
+        xrImageMesh.scale.set(1, 1, 1);
+      }
+    },
+    closeDetails,
   };
 }

@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { VRButton } from 'three/addons/webxr/VRButton.js';
 import './style.css';
 import { buildGallery } from './gallery';
 import { createControls } from './controls';
@@ -133,6 +134,9 @@ async function start() {
   let pixelRatio = initialPixelRatio;
   renderer.setPixelRatio(pixelRatio);
   renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.xr.enabled = true;
+  renderer.xr.setReferenceSpaceType('local-floor');
+  renderer.xr.setFramebufferScaleFactor(0.9);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.28;
@@ -155,7 +159,11 @@ async function start() {
   pmrem.dispose();
 
   const camera = new THREE.PerspectiveCamera(72, window.innerWidth / window.innerHeight, 0.08, 180);
-  camera.position.set(0, 1.68, 7.4);
+  const playerRig = new THREE.Group();
+  playerRig.position.set(0, 0, 7.4);
+  camera.position.set(0, 1.68, 0);
+  playerRig.add(camera);
+  scene.add(playerRig);
 
   const collection = await loadCollection();
   let wakeRenderer = () => {};
@@ -166,6 +174,7 @@ async function start() {
   renderer.shadowMap.needsUpdate = true;
   let enterGallery = () => {};
   let closeControlsDetails = () => {};
+  let closeUIDetails = () => {};
   const modelPreview = createModelPreview(environmentMap);
   const ui = createUI(
     () => enterGallery(),
@@ -177,12 +186,16 @@ async function start() {
       modelPreview.close();
       closeControlsDetails();
     },
+    camera,
+    (file) => gallery.getModelPreview(file),
   );
   ui.setArtworkCount(gallery.displays.length);
   ui.setArtworkIndex(new Map(gallery.displays.map((display, index) => [display.meta.file, index])));
 
   const controls = createControls(
     camera,
+    playerRig,
+    renderer,
     renderer.domElement,
     gallery.colliders,
     gallery.imageTargets,
@@ -190,9 +203,11 @@ async function start() {
     ui.setLocked,
     () => wakeRenderer(),
     ui.showDetails,
+    () => closeUIDetails(),
   );
   enterGallery = controls.enter;
   closeControlsDetails = controls.closeDetails;
+  closeUIDetails = ui.closeDetails;
 
   let frameHandle = 0;
   let last = performance.now();
@@ -204,6 +219,7 @@ async function start() {
   let slowWindows = 0;
   let fastWindows = 0;
   let running = true;
+  let xrPresenting = false;
 
   const roomAt = (x: number, z: number) => {
     if (Math.abs(x) < 13 && Math.abs(z) < 12) return 'The Atrium';
@@ -223,17 +239,19 @@ async function start() {
     if (!document.hidden) wakeRenderer();
   });
 
-  const loop = (now: number) => {
+  const loop = (now: number, xrFrame?: XRFrame) => {
     if (!running) return;
     frameHandle = 0;
     const dt = Math.min((now - last) / 1000, 0.033);
     last = now;
+    if (xrFrame) controls.setXRInputSources(Array.from(xrFrame.session.inputSources));
     const moving = controls.update(dt, now);
     gallery.animateDetails(now / 1000);
+    ui.animateXR(dt);
 
     if (now - lastStream > 320) {
       lastStream = now;
-      const loadingOrNearby = gallery.loadNearbyArt(camera.position);
+      const loadingOrNearby = gallery.loadNearbyArt(playerRig.position);
       if (loadingOrNearby && !streamTimer) {
         streamTimer = setTimeout(() => {
           streamTimer = null;
@@ -243,7 +261,7 @@ async function start() {
     }
     if (now - lastRoomUpdate > 450) {
       lastRoomUpdate = now;
-      ui.setRoom(roomAt(camera.position.x, camera.position.z));
+      ui.setRoom(roomAt(playerRig.position.x, playerRig.position.z));
     }
 
     renderer.render(scene, camera);
@@ -257,7 +275,7 @@ async function start() {
       slowWindows = 0;
       fastWindows = 0;
     }
-    if (moving && now - fpsWindowStart >= 1500) {
+    if (moving && !xrPresenting && now - fpsWindowStart >= 1500) {
       const fps = fpsFrames * 1000 / (now - fpsWindowStart);
       fpsWindowStart = now;
       fpsFrames = 0;
@@ -276,12 +294,31 @@ async function start() {
       }
     }
 
-    if (moving) wakeRenderer();
+    if (moving && !xrPresenting) wakeRenderer();
   };
 
   wakeRenderer = () => {
-    if (running && !document.hidden && !frameHandle) frameHandle = requestAnimationFrame(loop);
+    if (running && !xrPresenting && !document.hidden && !frameHandle) frameHandle = requestAnimationFrame((now) => loop(now));
   };
+  renderer.xr.addEventListener('sessionstart', () => {
+    xrPresenting = true;
+    camera.userData['xrPresenting'] = true;
+    if (frameHandle) cancelAnimationFrame(frameHandle);
+    frameHandle = 0;
+    fpsWindowStart = performance.now();
+    fpsFrames = 0;
+    renderer.setAnimationLoop(loop);
+  });
+  renderer.xr.addEventListener('sessionend', () => {
+    xrPresenting = false;
+    camera.userData['xrPresenting'] = false;
+    renderer.setAnimationLoop(null);
+    last = performance.now();
+    wakeRenderer();
+  });
+  const vrButton = VRButton.createButton(renderer, { optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking'] });
+  vrButton.classList.add('vr-button');
+  document.body.appendChild(vrButton);
   wakeRenderer();
   window.addEventListener('pagehide', () => {
     running = false;

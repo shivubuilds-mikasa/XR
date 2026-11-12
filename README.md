@@ -60,6 +60,9 @@ Artwork is loaded as it comes into view. The renderer adapts its workload when f
 </tr>
 </table>
 
+### 🥽 Visit in VR
+Open the [live museum](https://shivubuilds-mikasa.github.io/XR/) in Meta Quest 3 Browser and choose **ENTER VR**. Point a controller at an exhibit and squeeze its trigger to open the in-headset story panel; squeeze again to return. Use the left thumbstick to move and turn your head to look around.
+
 <br />
 
 ## Take the tour
