@@ -1,0 +1,15 @@
+{
+  "name": "Atelier Museum — The Permanent Collection",
+  "short_name": "Atelier Museum",
+  "theme_color": "#101511",
+  "start_url": "./",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "./icons/atelier.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ]
+}

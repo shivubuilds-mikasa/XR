@@ -22,3 +22,16 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Android app signing key files
+*.keystore
+*.jks
+*.apk
+*.idsig
+local.properties
+**/.gradle/
+**/build/
+
+
+# Local Netlify folder
+.netlify

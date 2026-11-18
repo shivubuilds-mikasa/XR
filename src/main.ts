@@ -319,6 +319,26 @@ async function start() {
   const vrButton = VRButton.createButton(renderer, { optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking'] });
   vrButton.classList.add('vr-button');
   document.body.appendChild(vrButton);
+
+  // Meta's immersive PWA launch counts as user activation for WebXR. Keep the
+  // regular website's welcome screen and explicit VR button unchanged.
+  const questWindow = window as Window & {
+    getDigitalGoodsService?: (...args: unknown[]) => unknown;
+  };
+  if (questWindow.getDigitalGoodsService && navigator.xr) {
+    try {
+      const supported = await navigator.xr.isSessionSupported('immersive-vr');
+      if (supported) {
+        const session = await navigator.xr.requestSession('immersive-vr', {
+          optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking'],
+        });
+        await renderer.xr.setSession(session);
+      }
+    } catch (error) {
+      console.error('The Quest app could not start an immersive session.', error);
+    }
+  }
+
   wakeRenderer();
   window.addEventListener('pagehide', () => {
     running = false;

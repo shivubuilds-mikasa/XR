@@ -1,0 +1,8 @@
+[{
+      "relation": ["delegate_permission/common.handle_all_urls"],
+      "target": {
+        "namespace": "android_app",
+        "package_name": "com.shivubuilds.ateliermuseum",
+        "sha256_cert_fingerprints": ["7B:C5:64:D6:5D:A9:39:48:E2:A1:0A:70:A7:56:80:DD:FC:A5:2C:0F:CE:12:EA:83:E1:8B:62:49:0A:E9:1C:81"]
+      }
+    }]

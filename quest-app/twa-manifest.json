@@ -1,0 +1,59 @@
+{
+  "packageId": "com.shivubuilds.ateliermuseum",
+  "applicationId": "0",
+  "host": "spiffy-elf-cca541.netlify.app",
+  "name": "Atelier Museum — The Permanent Collection",
+  "launcherName": "Atelier",
+  "display": "standalone",
+  "themeColor": "#101511",
+  "themeColorDark": "#101511",
+  "navigationColor": "#101511",
+  "navigationColorDark": "#101511",
+  "navigationDividerColor": "#000000",
+  "navigationDividerColorDark": "#000000",
+  "backgroundColor": "#17211B",
+  "enableNotifications": true,
+  "enableMicrophone": false,
+  "enableXRScene": false,
+  "startUrl": "/",
+  "iconUrl": "https://spiffy-elf-cca541.netlify.app/icons/atelier.svg",
+  "maskableIconUrl": "https://spiffy-elf-cca541.netlify.app/icons/atelier.svg",
+  "splashScreenFadeOutDuration": 300,
+  "signingKey": {
+    "path": "android.keystore",
+    "alias": "android"
+  },
+  "appVersionName": "2",
+  "appVersionCode": 2,
+  "shortcuts": [],
+  "generatorApp": "bubblewrap-cli",
+  "webManifestUrl": "https://spiffy-elf-cca541.netlify.app/manifest.webmanifest",
+  "fallbackType": "customtabs",
+  "features": {
+    "horizonPlatformSDK": {
+      "enabled": true
+    }
+  },
+  "alphaDependencies": {
+    "enabled": false
+  },
+  "enableSiteSettingsShortcut": true,
+  "isChromeOSOnly": false,
+  "isMetaQuest": true,
+  "horizonOSAppMode": "immersive",
+  "fullScopeUrl": "https://spiffy-elf-cca541.netlify.app/",
+  "minSdkVersion": 23,
+  "orientation": "default",
+  "fingerprints": [
+    {
+      "value": "7B:C5:64:D6:5D:A9:39:48:E2:A1:0A:70:A7:56:80:DD:FC:A5:2C:0F:CE:12:EA:83:E1:8B:62:49:0A:E9:1C:81"
+    }
+  ],
+  "additionalTrustedOrigins": [],
+  "retainedBundles": [],
+  "protocolHandlers": [],
+  "fileHandlers": [],
+  "launchHandlerClientMode": "",
+  "displayOverride": [],
+  "appVersion": "2"
+}
