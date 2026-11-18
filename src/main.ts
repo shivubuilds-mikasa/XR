@@ -139,7 +139,7 @@ async function start() {
   renderer.xr.setFramebufferScaleFactor(0.9);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.28;
+  renderer.toneMappingExposure = 1.1;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -154,7 +154,7 @@ async function start() {
   const roomEnvironment = new RoomEnvironment();
   const environmentMap = pmrem.fromScene(roomEnvironment).texture;
   scene.environment = environmentMap;
-  scene.environmentIntensity = 0.48;
+  scene.environmentIntensity = 0.35;
   roomEnvironment.dispose();
   pmrem.dispose();
 

@@ -342,6 +342,126 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     { x0: 13, x1: 40, z0: -12, z1: 12, name: 'East Gallery' },
   ];
 
+  const addSecurityCameras = () => {
+    const cameraCount = rooms.length * 4;
+    const housing = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(0.38, 0.22, 0.28),
+      new THREE.MeshStandardMaterial({ color: 0x202428, roughness: 0.38, metalness: 0.58 }),
+      cameraCount,
+    );
+    const bracket = new THREE.InstancedMesh(
+      new THREE.BoxGeometry(0.13, 0.23, 0.11),
+      new THREE.MeshStandardMaterial({ color: 0x363b3d, roughness: 0.42, metalness: 0.55 }),
+      cameraCount,
+    );
+    const lens = new THREE.InstancedMesh(
+      new THREE.CylinderGeometry(0.056, 0.056, 0.08, 12),
+      new THREE.MeshStandardMaterial({ color: 0x101b23, roughness: 0.16, metalness: 0.35 }),
+      cameraCount,
+    );
+    const statusLight = new THREE.InstancedMesh(
+      new THREE.SphereGeometry(0.018, 8, 6),
+      new THREE.MeshBasicMaterial({ color: 0x6f2119 }),
+      cameraCount,
+    );
+    const cameraPose = new THREE.Object3D();
+    const worldMatrix = new THREE.Matrix4();
+    const instancePosition = new THREE.Vector3();
+    const instanceScale = new THREE.Vector3();
+    const lensRotation = new THREE.Quaternion().setFromEuler(new THREE.Euler(Math.PI / 2, 0, 0));
+    const placePart = (
+      target: THREE.InstancedMesh,
+      index: number,
+      localPosition: THREE.Vector3,
+      scale: THREE.Vector3,
+      localRotation = new THREE.Quaternion(),
+    ) => {
+      instancePosition.copy(localPosition).applyQuaternion(cameraPose.quaternion).add(cameraPose.position);
+      instanceScale.copy(scale);
+      const rotation = cameraPose.quaternion.clone().multiply(localRotation);
+      worldMatrix.compose(instancePosition, rotation, instanceScale);
+      target.setMatrixAt(index, worldMatrix);
+    };
+
+    let index = 0;
+    for (const room of rooms) {
+      const centerX = (room.x0 + room.x1) / 2;
+      const centerZ = (room.z0 + room.z1) / 2;
+      const corners: Array<[number, number]> = [
+        [room.x0 + 0.65, room.z0 + 0.65],
+        [room.x1 - 0.65, room.z0 + 0.65],
+        [room.x1 - 0.65, room.z1 - 0.65],
+        [room.x0 + 0.65, room.z1 - 0.65],
+      ];
+      for (const [x, z] of corners) {
+        cameraPose.position.set(x, WALL_HEIGHT - 0.55, z);
+        cameraPose.lookAt(centerX, 2.8, centerZ);
+        const one = new THREE.Vector3(1, 1, 1);
+        placePart(housing, index, new THREE.Vector3(), new THREE.Vector3(1, 1, 1));
+        placePart(bracket, index, new THREE.Vector3(0, 0.19, -0.02), one, new THREE.Quaternion());
+        placePart(lens, index, new THREE.Vector3(0, -0.035, 0.16), one, lensRotation);
+        placePart(statusLight, index, new THREE.Vector3(0.13, 0.055, 0.145), one);
+        index++;
+      }
+    }
+    for (const mesh of [housing, bracket, lens, statusLight]) {
+      mesh.instanceMatrix.needsUpdate = true;
+      mesh.castShadow = false;
+      mesh.receiveShadow = false;
+      scene.add(mesh);
+    }
+  };
+
+  const addExitSigns = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 72;
+    const context = canvas.getContext('2d')!;
+    context.fillStyle = '#174a36';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.strokeStyle = '#f0f4e8';
+    context.lineWidth = 6;
+    context.strokeRect(3, 3, canvas.width - 6, canvas.height - 6);
+    context.fillStyle = '#f7f5e8';
+    context.beginPath();
+    context.moveTo(18, 36);
+    context.lineTo(38, 18);
+    context.lineTo(38, 29);
+    context.lineTo(61, 29);
+    context.lineTo(61, 43);
+    context.lineTo(38, 43);
+    context.lineTo(38, 54);
+    context.closePath();
+    context.fill();
+    context.font = '700 43px system-ui, sans-serif';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    context.fillText('EXIT', 158, 37);
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.colorSpace = THREE.SRGBColorSpace;
+    texture.anisotropy = 2;
+    const material = new THREE.MeshBasicMaterial({ map: texture, toneMapped: false, side: THREE.DoubleSide });
+    const geometry = new THREE.PlaneGeometry(1.08, 0.305);
+    const portals = [
+      { x: 0, z: -11.72, yaw: 0 },
+      { x: 0, z: 11.72, yaw: Math.PI },
+      { x: -12.72, z: 0, yaw: Math.PI / 2 },
+      { x: 12.72, z: 0, yaw: -Math.PI / 2 },
+    ];
+    for (const portal of portals) {
+      const normal = new THREE.Vector3(Math.sin(portal.yaw), 0, Math.cos(portal.yaw));
+      for (const side of [-1, 1]) {
+        const sign = new THREE.Mesh(geometry, material);
+        const wallFaceOffset = side > 0 ? 0.16 : 0.56;
+        sign.position.set(portal.x, 5.56, portal.z).addScaledVector(normal, side * wallFaceOffset);
+        sign.rotation.y = portal.yaw + (side < 0 ? Math.PI : 0);
+        sign.castShadow = false;
+        sign.frustumCulled = false;
+        scene.add(sign);
+      }
+    }
+  };
+
   const addBox = (
     geometry: THREE.BufferGeometry,
     material: THREE.Material,
@@ -389,6 +509,7 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   // makes it easy to explore without getting trapped against a wall.
   for (const room of rooms) addFloor(room);
   const animateRoomFans = addRoomFans(rooms);
+  addSecurityCameras();
 
   // Central hall: three-metre portals keep each wing connected while making
   // the cross walls read as continuous architecture instead of one open hall.
@@ -420,6 +541,7 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   addAutomaticDoor(0, 11.72, Math.PI);
   addAutomaticDoor(-12.72, 0, Math.PI / 2);
   addAutomaticDoor(12.72, 0, -Math.PI / 2);
+  addExitSigns();
 
   // Wing perimeter walls and their shared partitions.
   addWall(-13, -25, 0.42, WALL_HEIGHT, 26);
@@ -488,8 +610,8 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   softShadow.position.set(0, -0.055, 0);
   scene.add(softShadow);
 
-  const ambient = new THREE.HemisphereLight(0xfff4df, 0x44382a, 1.35);
-  const key = new THREE.DirectionalLight(0xffe8c8, 1.65);
+  const ambient = new THREE.HemisphereLight(0xfff4df, 0x44382a, 0.85);
+  const key = new THREE.DirectionalLight(0xffe8c8, 1.05);
   key.position.set(-7, 13, 5);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
@@ -502,14 +624,14 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   key.shadow.camera.updateProjectionMatrix();
   key.shadow.bias = -0.00012;
   key.shadow.normalBias = 0.015;
-  const fill = new THREE.DirectionalLight(0xe5dcc9, 0.38);
+  const fill = new THREE.DirectionalLight(0xe5dcc9, 0.22);
   fill.position.set(8, 7, -8);
   scene.add(ambient, key, fill);
 
   // Warm pools of light make each wing feel like its own room while keeping
   // the lighting cost low: these lights do not cast additional shadow maps.
   for (const room of rooms) {
-    const light = new THREE.PointLight(0xffe2bd, room.name === 'The Atrium' ? 22 : 16, 27, 2);
+    const light = new THREE.PointLight(0xffe2bd, room.name === 'The Atrium' ? 15 : 10.5, 27, 2);
     light.position.set((room.x0 + room.x1) / 2, WALL_HEIGHT - 0.9, (room.z0 + room.z1) / 2);
     scene.add(light);
   }
@@ -535,7 +657,7 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     frame.castShadow = true;
     group.add(frame);
 
-    const imageMaterial = new THREE.MeshStandardMaterial({ map: placeholder, color: 0xffffff, roughness: 0.9 });
+    const imageMaterial = new THREE.MeshBasicMaterial({ map: placeholder, color: 0xffffff, toneMapped: false });
     const image = new THREE.Mesh(frameImageGeometry, imageMaterial);
     image.scale.set(width, height, 1);
     image.position.z = 0.116;
