@@ -139,7 +139,7 @@ async function start() {
   renderer.xr.setFramebufferScaleFactor(0.9);
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
-  renderer.toneMappingExposure = 1.28;
+  renderer.toneMappingExposure = 1.1;
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
@@ -154,7 +154,7 @@ async function start() {
   const roomEnvironment = new RoomEnvironment();
   const environmentMap = pmrem.fromScene(roomEnvironment).texture;
   scene.environment = environmentMap;
-  scene.environmentIntensity = 0.48;
+  scene.environmentIntensity = 0.35;
   roomEnvironment.dispose();
   pmrem.dispose();
 
@@ -246,6 +246,7 @@ async function start() {
     last = now;
     if (xrFrame) controls.setXRInputSources(Array.from(xrFrame.session.inputSources));
     const moving = controls.update(dt, now);
+    gallery.updateDoors(playerRig.position, dt);
     gallery.animateDetails(now / 1000);
     ui.animateXR(dt);
 
@@ -319,6 +320,26 @@ async function start() {
   const vrButton = VRButton.createButton(renderer, { optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking'] });
   vrButton.classList.add('vr-button');
   document.body.appendChild(vrButton);
+
+  // Meta's immersive PWA launch counts as user activation for WebXR. Keep the
+  // regular website's welcome screen and explicit VR button unchanged.
+  const questWindow = window as Window & {
+    getDigitalGoodsService?: (...args: unknown[]) => unknown;
+  };
+  if (questWindow.getDigitalGoodsService && navigator.xr) {
+    try {
+      const supported = await navigator.xr.isSessionSupported('immersive-vr');
+      if (supported) {
+        const session = await navigator.xr.requestSession('immersive-vr', {
+          optionalFeatures: ['local-floor', 'bounded-floor', 'hand-tracking'],
+        });
+        await renderer.xr.setSession(session);
+      }
+    } catch (error) {
+      console.error('The Quest app could not start an immersive session.', error);
+    }
+  }
+
   wakeRenderer();
   window.addEventListener('pagehide', () => {
     running = false;

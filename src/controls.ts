@@ -1,4 +1,6 @@
 import * as THREE from 'three';
+import { XRControllerModelFactory } from 'three/addons/webxr/XRControllerModelFactory.js';
+import { XRHandModelFactory } from 'three/addons/webxr/XRHandModelFactory.js';
 import type { GalleryExhibit } from './types';
 
 const WALKABLE = (x: number, z: number) =>
@@ -33,6 +35,19 @@ export function createControls(
   let detailOpen = false;
   let forceRaycast = false;
   const controllers = [renderer.xr.getController(0), renderer.xr.getController(1)];
+  const controllerModelFactory = new XRControllerModelFactory();
+  const handModelFactory = new XRHandModelFactory(undefined, (object) => {
+    const handMaterial = new THREE.MeshStandardMaterial({
+      color: 0x9cddff,
+      emissive: 0x1685c8,
+      emissiveIntensity: 0.28,
+      roughness: 0.4,
+      metalness: 0.03,
+    });
+    object.traverse((part) => {
+      if ((part as THREE.Mesh).isMesh) (part as THREE.Mesh).material = handMaterial.clone();
+    });
+  });
   const controllerRay = new THREE.Raycaster();
   controllerRay.far = 8;
   let leftStickX = 0;
@@ -61,7 +76,8 @@ export function createControls(
     }
   };
 
-  for (const controller of controllers) {
+  for (let index = 0; index < controllers.length; index++) {
+    const controller = controllers[index];
     const points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1)];
     const beam = new THREE.Line(
       new THREE.BufferGeometry().setFromPoints(points),
@@ -70,6 +86,23 @@ export function createControls(
     beam.scale.z = 7;
     controller.add(beam);
     playerRig.add(controller);
+
+    const grip = renderer.xr.getControllerGrip(index);
+    grip.add(controllerModelFactory.createControllerModel(grip));
+    playerRig.add(grip);
+
+    // Quest supplies joint poses when the visitor chooses hand tracking. Keep
+    // controller input available and show a tracked hand only for hand sources.
+    const hand = renderer.xr.getHand(index);
+    hand.visible = false;
+    hand.add(handModelFactory.createHandModel(hand, 'mesh'));
+    hand.addEventListener('connected', (event) => {
+      const source = (event as unknown as { data?: XRInputSource }).data;
+      hand.visible = Boolean(source?.hand);
+    });
+    hand.addEventListener('disconnected', () => { hand.visible = false; });
+    playerRig.add(hand);
+
     controller.addEventListener('connected', (event) => {
       const source = (event as unknown as { data?: XRInputSource }).data;
       if (source?.handedness) controllersByHand.set(source.handedness, controller);
