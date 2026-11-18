@@ -10,6 +10,8 @@ type ArtworkDisplay = {
   position: THREE.Vector3;
   width: number;
   height: number;
+  yaw: number;
+  front: THREE.Vector3;
   loading: boolean;
   loaded: boolean;
 };
@@ -54,7 +56,9 @@ function makeWallTexture() {
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = 512;
   const ctx = canvas.getContext('2d')!;
-  ctx.fillStyle = '#e9e5dc';
+  // Warm sand-mustard plaster keeps the room bright while giving the art a
+  // quieter, more traditional museum backdrop.
+  ctx.fillStyle = '#cdb782';
   ctx.fillRect(0, 0, 512, 512);
   let seed = 72341;
   const random = () => {
@@ -121,7 +125,7 @@ async function loadSmallTexture(url: string): Promise<THREE.Texture> {
 export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAssetReady: () => void = () => {}) {
   const floorTexture = makeFloorTexture();
   const wallTexture = makeWallTexture();
-  const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x526a53, map: wallTexture, roughness: 0.94 });
+  const wallMaterial = new THREE.MeshStandardMaterial({ color: 0xfff6df, map: wallTexture, roughness: 0.96 });
   const ceilingMaterial = new THREE.MeshBasicMaterial({ color: 0xc8c5b8, toneMapped: false });
   const trimMaterial = new THREE.MeshStandardMaterial({ color: 0x987346, roughness: 0.32, metalness: 0.55 });
   const darkWoodMaterial = new THREE.MeshStandardMaterial({ color: 0x38291e, roughness: 0.5 });
@@ -140,6 +144,78 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   const imageTargets: THREE.Object3D[] = [];
   const displays: ArtworkDisplay[] = [];
   const colliders: THREE.Box3[] = [];
+  const baseTransforms: THREE.Matrix4[] = [];
+  const postTransforms: THREE.Matrix4[] = [];
+  const finialTransforms: THREE.Matrix4[] = [];
+  const ropeTransforms: THREE.Matrix4[] = [];
+  const barrierMatrix = new THREE.Matrix4();
+  const barrierPosition = new THREE.Vector3();
+  const barrierRotation = new THREE.Quaternion();
+  const barrierScale = new THREE.Vector3(1, 1, 1);
+  const barrierEuler = new THREE.Euler();
+  const barrierDark = new THREE.MeshStandardMaterial({ color: 0x161719, roughness: 0.28, metalness: 0.72 });
+  const barrierRope = new THREE.MeshStandardMaterial({ color: 0x831b1d, roughness: 0.78, metalness: 0.02 });
+  const barrierBaseGeometry = new THREE.CylinderGeometry(0.22, 0.26, 0.14, 12);
+  const barrierPostGeometry = new THREE.CylinderGeometry(0.055, 0.075, 0.9, 10);
+  const barrierFinialGeometry = new THREE.SphereGeometry(0.13, 12, 8);
+  const barrierRopeCurve = new THREE.CatmullRomCurve3([
+    new THREE.Vector3(-0.5, 0.82, 0),
+    new THREE.Vector3(-0.28, 0.65, 0),
+    new THREE.Vector3(0, 0.59, 0),
+    new THREE.Vector3(0.28, 0.65, 0),
+    new THREE.Vector3(0.5, 0.82, 0),
+  ]);
+  const barrierRopeGeometry = new THREE.TubeGeometry(barrierRopeCurve, 16, 0.034, 6, false);
+  const putBarrierTransform = (target: THREE.Matrix4[], position: THREE.Vector3, yaw = 0, scaleX = 1) => {
+    barrierPosition.copy(position);
+    barrierEuler.set(0, yaw, 0);
+    barrierRotation.setFromEuler(barrierEuler);
+    barrierScale.set(scaleX, 1, 1);
+    barrierMatrix.compose(barrierPosition, barrierRotation, barrierScale);
+    target.push(barrierMatrix.clone());
+  };
+  const addStanchion = (x: number, z: number, yaw = 0) => {
+    putBarrierTransform(baseTransforms, new THREE.Vector3(x, 0.08, z), yaw);
+    putBarrierTransform(postTransforms, new THREE.Vector3(x, 0.58, z), yaw);
+    putBarrierTransform(finialTransforms, new THREE.Vector3(x, 1.08, z), yaw);
+  };
+  const addBarrierLine = (start: THREE.Vector3, end: THREE.Vector3) => {
+    const dx = end.x - start.x;
+    const dz = end.z - start.z;
+    const length = Math.hypot(dx, dz);
+    const yaw = Math.atan2(-dz, dx);
+    const midpoint = new THREE.Vector3((start.x + end.x) / 2, 0, (start.z + end.z) / 2);
+    putBarrierTransform(ropeTransforms, midpoint, yaw, length);
+    const bounds = new THREE.Box3().setFromPoints([start, end]);
+    bounds.min.y = 0;
+    bounds.max.y = 1;
+    bounds.expandByVector(new THREE.Vector3(0.2, 0, 0.2));
+    colliders.push(bounds);
+  };
+  const addArtworkBarrier = (display: ArtworkDisplay) => {
+    const normal = display.front;
+    const tangent = new THREE.Vector3(Math.cos(display.yaw), 0, -Math.sin(display.yaw));
+    const center = new THREE.Vector3(display.position.x, 0, display.position.z).addScaledVector(normal, 2.15);
+    const half = display.width / 2 + 0.5;
+    const left = center.clone().addScaledVector(tangent, -half);
+    const middle = center.clone();
+    const right = center.clone().addScaledVector(tangent, half);
+    addStanchion(left.x, left.z, display.yaw);
+    addStanchion(middle.x, middle.z, display.yaw);
+    addStanchion(right.x, right.z, display.yaw);
+    addBarrierLine(left, middle);
+    addBarrierLine(middle, right);
+  };
+  const addSculptureBarrier = (x: number, z: number, radius: number) => {
+    const corners = [
+      new THREE.Vector3(x - radius, 0, z - radius),
+      new THREE.Vector3(x + radius, 0, z - radius),
+      new THREE.Vector3(x + radius, 0, z + radius),
+      new THREE.Vector3(x - radius, 0, z + radius),
+    ];
+    for (const corner of corners) addStanchion(corner.x, corner.z);
+    for (let i = 0; i < corners.length; i++) addBarrierLine(corners[i], corners[(i + 1) % corners.length]);
+  };
 
   const rooms = [
     { x0: -13, x1: 13, z0: -12, z1: 12, name: 'The Atrium' },
@@ -286,8 +362,8 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   softShadow.position.set(0, -0.055, 0);
   scene.add(softShadow);
 
-  const ambient = new THREE.HemisphereLight(0xfff4df, 0x26372d, 1.8);
-  const key = new THREE.DirectionalLight(0xffe8c8, 2.2);
+  const ambient = new THREE.HemisphereLight(0xfff4df, 0x44382a, 1.35);
+  const key = new THREE.DirectionalLight(0xffe8c8, 1.65);
   key.position.set(-7, 13, 5);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
@@ -300,14 +376,14 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   key.shadow.camera.updateProjectionMatrix();
   key.shadow.bias = -0.00012;
   key.shadow.normalBias = 0.015;
-  const fill = new THREE.DirectionalLight(0xbdd2d8, 0.48);
+  const fill = new THREE.DirectionalLight(0xe5dcc9, 0.38);
   fill.position.set(8, 7, -8);
   scene.add(ambient, key, fill);
 
   // Warm pools of light make each wing feel like its own room while keeping
   // the lighting cost low: these lights do not cast additional shadow maps.
   for (const room of rooms) {
-    const light = new THREE.PointLight(0xffd9a4, room.name === 'The Atrium' ? 34 : 24, 27, 2);
+    const light = new THREE.PointLight(0xffe2bd, room.name === 'The Atrium' ? 22 : 16, 27, 2);
     light.position.set((room.x0 + room.x1) / 2, WALL_HEIGHT - 0.9, (room.z0 + room.z1) / 2);
     scene.add(light);
   }
@@ -333,7 +409,7 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     frame.castShadow = true;
     group.add(frame);
 
-    const imageMaterial = new THREE.MeshBasicMaterial({ map: placeholder, color: 0xffffff, toneMapped: false });
+    const imageMaterial = new THREE.MeshStandardMaterial({ map: placeholder, color: 0xffffff, roughness: 0.9 });
     const image = new THREE.Mesh(frameImageGeometry, imageMaterial);
     image.scale.set(width, height, 1);
     image.position.z = 0.116;
@@ -348,6 +424,8 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
 
     const display: ArtworkDisplay = {
       meta, image, hitArea, position: new THREE.Vector3(x, 2.52, z), width, height, loading: false, loaded: false,
+      yaw,
+      front: new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw)),
     };
     displays.push(display);
     return display;
@@ -375,6 +453,10 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   for (const z of [-8, -2.7, 2.7, 8]) addNext(39.72, z, -Math.PI / 2);
   // The east wing mirrors the west wing; keep each work on its own wall slot.
   for (const x of [20, 34]) { addNext(x, -11.72, 0); addNext(x, 11.72, Math.PI); }
+
+  // Rope stanchions protect each canvas. Instanced meshes keep the high post
+  // count inexpensive on standalone Quest hardware.
+  for (const display of displays) addArtworkBarrier(display);
 
   // Small wall sconces use emissive surfaces instead of expensive point lights.
   for (const room of rooms.slice(1)) {
@@ -430,6 +512,22 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     { file: 'ship_in_a_bottle.glb', title: 'Ship in a Bottle', description: 'A miniature sailing ship sits inside a glass bottle, bringing rigging, hull, and delicate model-making into one compact object. Displayed in the West Gallery.', x: -26.5, z: 0, height: 1.25, baseY: 1.2, fallbackIndex: 2 },
     { file: 'tete_dhomme_barbu_coiffe_dun_turban.glb', title: 'Bearded Man with a Turban', description: 'A sculpted head study of a bearded man, where the wrapped turban and carefully modelled features give the portrait its strong outline.', x: 26.5, z: 0, height: 2.15, baseY: 1.2, fallbackIndex: 3 },
   ];
+  addSculptureBarrier(0, 0, 2.05);
+  statueSpecs.forEach((statue) => addSculptureBarrier(statue.x, statue.z, 1.95));
+  const addInstances = (geometry: THREE.BufferGeometry, material: THREE.Material, transforms: THREE.Matrix4[]) => {
+    if (transforms.length === 0) return;
+    const mesh = new THREE.InstancedMesh(geometry, material, transforms.length);
+    mesh.count = transforms.length;
+    for (let i = 0; i < transforms.length; i++) mesh.setMatrixAt(i, transforms[i]);
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.castShadow = false;
+    mesh.receiveShadow = false;
+    scene.add(mesh);
+  };
+  addInstances(barrierBaseGeometry, barrierDark, baseTransforms);
+  addInstances(barrierPostGeometry, barrierDark, postTransforms);
+  addInstances(barrierFinialGeometry, barrierDark, finialTransforms);
+  addInstances(barrierRopeGeometry, barrierRope, ropeTransforms);
   const statues = statueSpecs.map((spec) => ({
     ...spec,
     loading: false,
@@ -437,6 +535,43 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   }));
   let statueLoads = 0;
   const modelPreviews = new Map<string, THREE.Object3D>();
+
+  // Reuse four focused spots and move them to the nearest paintings. This gives
+  // the artwork a warm highlight without creating one real-time light per wall.
+  const artworkSpotlights = Array.from({ length: 4 }, () => {
+    const spot = new THREE.SpotLight(0xffd7a1, 48, 10, 0.68, 0.78, 2);
+    spot.castShadow = false;
+    spot.visible = false;
+    scene.add(spot, spot.target);
+    return spot;
+  });
+  let lastArtworkLightUpdate = -Infinity;
+  const updateArtworkSpotlights = (position: THREE.Vector3) => {
+    const now = performance.now();
+    if (now - lastArtworkLightUpdate < 450) return;
+    lastArtworkLightUpdate = now;
+    const nearest = displays
+      .map((display) => ({ display, distance: display.position.distanceToSquared(position) }))
+      .filter(({ distance }) => distance < 21 * 21)
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, artworkSpotlights.length);
+    for (let i = 0; i < artworkSpotlights.length; i++) {
+      const light = artworkSpotlights[i];
+      const item = nearest[i]?.display;
+      if (!item) {
+        light.visible = false;
+        continue;
+      }
+      light.visible = true;
+      light.position.set(
+        item.position.x + item.front.x * 1.8,
+        5.35,
+        item.position.z + item.front.z * 1.8,
+      );
+      light.target.position.copy(item.position);
+      light.target.updateMatrixWorld();
+    }
+  };
 
   const loadStatue = (statue: typeof statues[number]) => {
     statue.loading = true;
@@ -552,6 +687,7 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
 
   let textureLoads = 0;
   const loadNearbyArt = (position: THREE.Vector3): boolean => {
+    updateArtworkSpotlights(position);
     const nearbyStatue = statues.find((statue) => !statue.loading && !statue.loaded &&
       Math.hypot(statue.x - position.x, statue.z - position.z) < (statue.fallbackIndex < 0 ? 24 : 30));
     if (nearbyStatue && statueLoads === 0) loadStatue(nearbyStatue);
