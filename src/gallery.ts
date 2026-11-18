@@ -160,8 +160,8 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     side: THREE.DoubleSide,
     depthWrite: false,
   });
-  const doorLeafWidth = 1.5;
-  const doorHeight = 4.55;
+  const doorLeafWidth = 1.6;
+  const doorHeight = 5.02;
   const doorDepth = 0.1;
   const doorBoxGeometry = new THREE.BoxGeometry(1, 1, 1);
   const doorGeometryPart = (
@@ -405,12 +405,12 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   // between the central hall and its four quieter wings.
   for (const z of [-12, 12]) {
     addBox(frameGeometry, wallMaterial, 0, 5.82, z, 3.5, 1.36, 0.42);
-    for (const side of [-1, 1]) addBox(frameGeometry, trimMaterial, side * 1.72, 2.8, z, 0.1, 5.6, 0.52);
+    for (const side of [-1, 1]) addBox(frameGeometry, trimMaterial, side * 1.6, 2.8, z, 0.1, 5.6, 0.52);
     addBox(frameGeometry, trimMaterial, 0, 5.08, z, 3.55, 0.09, 0.52);
   }
   for (const x of [-13, 13]) {
     addBox(frameGeometry, wallMaterial, x, 5.82, 0, 0.42, 1.36, 3.5);
-    for (const side of [-1, 1]) addBox(frameGeometry, trimMaterial, x, 2.8, side * 1.72, 0.52, 5.6, 0.1);
+    for (const side of [-1, 1]) addBox(frameGeometry, trimMaterial, x, 2.8, side * 1.6, 0.52, 5.6, 0.1);
     addBox(frameGeometry, trimMaterial, x, 5.08, 0, 0.52, 0.09, 3.55);
   }
 
