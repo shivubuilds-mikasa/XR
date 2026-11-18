@@ -272,11 +272,12 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   // makes it easy to explore without getting trapped against a wall.
   for (const room of rooms) addFloor(room);
 
-  // Central hall: four broad doorways open into the wings.
-  addWall(-7.75, -12, 10.5, WALL_HEIGHT, 0.42);
-  addWall(7.75, -12, 10.5, WALL_HEIGHT, 0.42);
-  addWall(-7.75, 12, 10.5, WALL_HEIGHT, 0.42);
-  addWall(7.75, 12, 10.5, WALL_HEIGHT, 0.42);
+  // Central hall: three-metre portals keep each wing connected while making
+  // the cross walls read as continuous architecture instead of one open hall.
+  addWall(-7.25, -12, 11.5, WALL_HEIGHT, 0.42);
+  addWall(7.25, -12, 11.5, WALL_HEIGHT, 0.42);
+  addWall(-7.25, 12, 11.5, WALL_HEIGHT, 0.42);
+  addWall(7.25, 12, 11.5, WALL_HEIGHT, 0.42);
   addWall(-13, -7.5, 0.42, WALL_HEIGHT, 9);
   addWall(-13, 7.5, 0.42, WALL_HEIGHT, 9);
   addWall(13, -7.5, 0.42, WALL_HEIGHT, 9);
@@ -285,14 +286,14 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   // Crafted brass lintels finish each broad doorway and create a clear rhythm
   // between the central hall and its four quieter wings.
   for (const z of [-12, 12]) {
-    addBox(frameGeometry, wallMaterial, 0, 5.82, z, 5.5, 1.36, 0.42);
-    for (const side of [-1, 1]) addBox(frameGeometry, trimMaterial, side * 2.72, 2.8, z, 0.1, 5.6, 0.52);
-    addBox(frameGeometry, trimMaterial, 0, 5.08, z, 5.55, 0.09, 0.52);
+    addBox(frameGeometry, wallMaterial, 0, 5.82, z, 3.5, 1.36, 0.42);
+    for (const side of [-1, 1]) addBox(frameGeometry, trimMaterial, side * 1.72, 2.8, z, 0.1, 5.6, 0.52);
+    addBox(frameGeometry, trimMaterial, 0, 5.08, z, 3.55, 0.09, 0.52);
   }
   for (const x of [-13, 13]) {
-    addBox(frameGeometry, wallMaterial, x, 5.82, 0, 0.42, 1.36, 5.5);
-    for (const side of [-1, 1]) addBox(frameGeometry, trimMaterial, x, 2.8, side * 2.72, 0.52, 5.6, 0.1);
-    addBox(frameGeometry, trimMaterial, x, 5.08, 0, 0.52, 0.09, 5.55);
+    addBox(frameGeometry, wallMaterial, x, 5.82, 0, 0.42, 1.36, 3.5);
+    for (const side of [-1, 1]) addBox(frameGeometry, trimMaterial, x, 2.8, side * 1.72, 0.52, 5.6, 0.1);
+    addBox(frameGeometry, trimMaterial, x, 5.08, 0, 0.52, 0.09, 3.55);
   }
 
   // Wing perimeter walls and their shared partitions.
@@ -458,26 +459,6 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   // count inexpensive on standalone Quest hardware.
   for (const display of displays) addArtworkBarrier(display);
 
-  // Small wall sconces use emissive surfaces instead of expensive point lights.
-  for (const room of rooms.slice(1)) {
-    const x = (room.x0 + room.x1) / 2;
-    const z = (room.z0 + room.z1) / 2;
-    const sideWalls = room.x1 - room.x0 < room.z1 - room.z0;
-    for (const side of [-1, 1]) {
-      if (sideWalls) {
-        const wallX = side < 0 ? room.x0 : room.x1;
-        const bodyX = wallX - side * 0.32;
-        addBox(frameGeometry, trimMaterial, bodyX, 2.52, z, 0.22, 0.64, 0.38);
-        addBox(frameGeometry, warmGlow, bodyX - side * 0.13, 2.52, z, 0.035, 0.38, 0.18);
-      } else {
-        const wallZ = side < 0 ? room.z0 : room.z1;
-        const bodyZ = wallZ - side * 0.32;
-        addBox(frameGeometry, trimMaterial, x, 2.52, bodyZ, 0.38, 0.64, 0.22);
-        addBox(frameGeometry, warmGlow, x, 2.52, bodyZ - side * 0.13, 0.18, 0.38, 0.035);
-      }
-    }
-  }
-
   // A discreet sculpture plinth gives each wing a focal point without crowding
   // the route through the rooms.
   const wingSculptures: THREE.Mesh[] = [];
@@ -640,49 +621,11 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     });
   };
 
-  // A sparse, low-cost dust field catches the gallery light.
-  const dustCount = 88;
-  const dustPositions = new Float32Array(dustCount * 3);
-  const dustBase = new Float32Array(dustCount * 3);
-  const dustPhase = new Float32Array(dustCount);
-  let seed = 93871;
-  const random = () => {
-    seed = (seed * 1664525 + 1013904223) >>> 0;
-    return seed / 4294967296;
-  };
-  for (let i = 0; i < dustCount; i++) {
-    const room = rooms[Math.floor(random() * rooms.length)];
-    const j = i * 3;
-    dustBase[j] = room.x0 + 1 + random() * (room.x1 - room.x0 - 2);
-    dustBase[j + 1] = 1 + random() * 3.8;
-    dustBase[j + 2] = room.z0 + 1 + random() * (room.z1 - room.z0 - 2);
-    dustPositions[j] = dustBase[j];
-    dustPositions[j + 1] = dustBase[j + 1];
-    dustPositions[j + 2] = dustBase[j + 2];
-    dustPhase[i] = random() * Math.PI * 2;
-  }
-  const dustGeometry = new THREE.BufferGeometry();
-  dustGeometry.setAttribute('position', new THREE.BufferAttribute(dustPositions, 3));
-  dustGeometry.computeBoundingSphere();
-  dustGeometry.boundingSphere!.radius += 0.3;
-  const dust = new THREE.Points(dustGeometry, new THREE.PointsMaterial({
-    color: 0xe8d7ae, size: 0.045, transparent: true, opacity: 0.32, depthWrite: false, sizeAttenuation: true,
-  }));
-  scene.add(dust);
-
   const animationBase = wingSculptures.map((sculpture) => sculpture.rotation.y);
   const animateDetails = (time: number) => {
     for (let i = 0; i < wingSculptures.length; i++) {
       wingSculptures[i].rotation.y = animationBase[i] + time * (i % 2 ? -0.045 : 0.045);
     }
-    for (let i = 0; i < dustCount; i++) {
-      const j = i * 3;
-      const phase = dustPhase[i] + time * 0.28;
-      dustPositions[j] = dustBase[j] + Math.sin(phase) * 0.12;
-      dustPositions[j + 1] = dustBase[j + 1] + Math.sin(phase * 0.7) * 0.18;
-      dustPositions[j + 2] = dustBase[j + 2] + Math.cos(phase * 0.8) * 0.12;
-    }
-    dustGeometry.attributes.position.needsUpdate = true;
   };
 
   let textureLoads = 0;
