@@ -35,9 +35,31 @@ export function createControls(
   const controllers = [renderer.xr.getController(0), renderer.xr.getController(1)];
   const controllerRay = new THREE.Raycaster();
   controllerRay.far = 8;
-  let activeController: THREE.XRTargetRaySpace | null = null;
   let leftStickX = 0;
   let leftStickY = 0;
+  let lastTriggerAction = -Infinity;
+  const triggerWasDown = new Map<string, boolean>();
+  const controllersByHand = new Map<string, THREE.XRTargetRaySpace>();
+
+  const activateControllerTarget = (controller: THREE.XRTargetRaySpace) => {
+    const now = performance.now();
+    // Quest browsers report both the WebXR `select` event and a gamepad button
+    // state. Debounce them so one squeeze can never open and immediately close.
+    if (now - lastTriggerAction < 300 || !renderer.xr.isPresenting || !active) return;
+    lastTriggerAction = now;
+    if (detailOpen) {
+      onCloseDetails();
+      return;
+    }
+    inspectController(controller);
+    if (focused) {
+      detailOpen = true;
+      keys.clear();
+      velocity.set(0, 0, 0);
+      onOpenDetails(focused);
+      onWake();
+    }
+  };
 
   for (const controller of controllers) {
     const points = [new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 0, -1)];
@@ -48,20 +70,15 @@ export function createControls(
     beam.scale.z = 7;
     controller.add(beam);
     playerRig.add(controller);
+    controller.addEventListener('connected', (event) => {
+      const source = (event as unknown as { data?: XRInputSource }).data;
+      if (source?.handedness) controllersByHand.set(source.handedness, controller);
+    });
+    controller.addEventListener('disconnected', () => {
+      for (const [hand, current] of controllersByHand) if (current === controller) controllersByHand.delete(hand);
+    });
     controller.addEventListener('select', () => {
-      if (!renderer.xr.isPresenting || !active) return;
-      if (detailOpen) {
-        onCloseDetails();
-        return;
-      }
-      inspectController(controller);
-      if (focused) {
-        detailOpen = true;
-        keys.clear();
-        velocity.set(0, 0, 0);
-        onOpenDetails(focused);
-        onWake();
-      }
+      activateControllerTarget(controller);
     });
   }
 
@@ -150,6 +167,11 @@ export function createControls(
   };
 
   const inspectController = (controller: THREE.XRTargetRaySpace) => {
+    // WebXR dispatches `select` between render callbacks, so ensure the ray and
+    // exhibit matrices reflect the latest headset pose before intersecting.
+    playerRig.updateWorldMatrix(true, true);
+    controller.updateWorldMatrix(true, false);
+    for (const target of artworkTargets) target.updateWorldMatrix(true, false);
     controllerRay.setFromXRController(controller);
     const hit = controllerRay.intersectObjects(artworkTargets, false)[0];
     setFocused((hit?.object.userData['exhibit'] as GalleryExhibit | undefined) ?? null);
@@ -210,12 +232,25 @@ export function createControls(
       if (!left?.gamepad) {
         leftStickX = 0;
         leftStickY = 0;
-        return;
+      } else {
+        const axes = left.gamepad.axes;
+        const offset = axes.length >= 4 ? 2 : 0;
+        leftStickX = Math.abs(axes[offset] ?? 0) > 0.14 ? axes[offset] : 0;
+        leftStickY = Math.abs(axes[offset + 1] ?? 0) > 0.14 ? axes[offset + 1] : 0;
       }
-      const axes = left.gamepad.axes;
-      const offset = axes.length >= 4 ? 2 : 0;
-      leftStickX = Math.abs(axes[offset] ?? 0) > 0.14 ? axes[offset] : 0;
-      leftStickY = Math.abs(axes[offset + 1] ?? 0) > 0.14 ? axes[offset + 1] : 0;
+      // Some Quest Browser/WebXR versions omit `select` for a frame or two.
+      // Poll the xr-standard primary trigger as a fallback, with edge detection.
+      for (const source of sources) {
+        if (!source.handedness || !source.gamepad) continue;
+        const hand = source.handedness;
+        const isDown = Boolean(source.gamepad.buttons[0]?.pressed);
+        const wasDown = triggerWasDown.get(hand) ?? false;
+        if (isDown && !wasDown) {
+          const controller = controllersByHand.get(hand);
+          if (controller) activateControllerTarget(controller);
+        }
+        triggerWasDown.set(hand, isDown);
+      }
     },
     update(dt: number, now: number): boolean {
       if (!active || detailOpen) return false;
@@ -249,13 +284,21 @@ export function createControls(
 
       const looked = forceRaycast;
       if (renderer.xr.isPresenting) {
-        const session = renderer.xr.getSession();
-        const sources = Array.from(session?.inputSources ?? []);
-        const rightSourceIndex = sources.findIndex((source) => source.handedness === 'right');
-        activeController = controllers[Math.max(0, rightSourceIndex)] ?? controllers[0];
-        if (now - lastRaycast > 100 && activeController) {
+        if (now - lastRaycast > 100) {
           lastRaycast = now;
-          inspectController(activeController);
+          let nextFocus: GalleryExhibit | null = null;
+          let closestDistance = Infinity;
+          for (const controller of controllers) {
+            playerRig.updateWorldMatrix(true, true);
+            controller.updateWorldMatrix(true, false);
+            controllerRay.setFromXRController(controller);
+            const hit = controllerRay.intersectObjects(artworkTargets, false)[0];
+            if (hit && hit.distance < closestDistance) {
+              closestDistance = hit.distance;
+              nextFocus = hit.object.userData['exhibit'] as GalleryExhibit | undefined ?? null;
+            }
+          }
+          setFocused(nextFocus);
         }
       } else if (looked || now - lastRaycast > 100) {
         lastRaycast = now;
