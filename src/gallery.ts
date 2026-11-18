@@ -436,7 +436,7 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     context.font = '700 43px system-ui, sans-serif';
     context.textAlign = 'center';
     context.textBaseline = 'middle';
-    context.fillText('EXIT', 158, 37);
+    context.fillText('ENTER', 165, 37);
     const texture = new THREE.CanvasTexture(canvas);
     texture.colorSpace = THREE.SRGBColorSpace;
     texture.anisotropy = 2;

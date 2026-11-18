@@ -62,8 +62,8 @@ android {
         
             targetSdkVersion 32
         
-        versionCode 8
-        versionName "8"
+        versionCode 9
+        versionName "9"
 
         // The name for the application
         resValue "string", "appName", twaManifest.name
