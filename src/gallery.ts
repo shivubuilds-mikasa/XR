@@ -258,7 +258,7 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
       rotors.push(rotor);
     }
     return (time: number) => {
-      for (let i = 0; i < rotors.length; i++) rotors[i].rotation.y = time * 0.32 + (i % 2) * 0.14;
+      for (let i = 0; i < rotors.length; i++) rotors[i].rotation.y = time * 0.48 + (i % 2) * 0.14;
     };
   };
   const baseTransforms: THREE.Matrix4[] = [];
@@ -396,10 +396,10 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   addWall(7.25, -12, 11.5, WALL_HEIGHT, 0.42);
   addWall(-7.25, 12, 11.5, WALL_HEIGHT, 0.42);
   addWall(7.25, 12, 11.5, WALL_HEIGHT, 0.42);
-  addWall(-13, -7.5, 0.42, WALL_HEIGHT, 9);
-  addWall(-13, 7.5, 0.42, WALL_HEIGHT, 9);
-  addWall(13, -7.5, 0.42, WALL_HEIGHT, 9);
-  addWall(13, 7.5, 0.42, WALL_HEIGHT, 9);
+  addWall(-13, -6.75, 0.42, WALL_HEIGHT, 10.5);
+  addWall(-13, 6.75, 0.42, WALL_HEIGHT, 10.5);
+  addWall(13, -6.75, 0.42, WALL_HEIGHT, 10.5);
+  addWall(13, 6.75, 0.42, WALL_HEIGHT, 10.5);
 
   // Crafted brass lintels finish each broad doorway and create a clear rhythm
   // between the central hall and its four quieter wings.
