@@ -246,6 +246,7 @@ async function start() {
     last = now;
     if (xrFrame) controls.setXRInputSources(Array.from(xrFrame.session.inputSources));
     const moving = controls.update(dt, now);
+    gallery.updateDoors(playerRig.position, dt);
     gallery.animateDetails(now / 1000);
     ui.animateXR(dt);
 

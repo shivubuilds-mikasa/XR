@@ -144,6 +144,123 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   const imageTargets: THREE.Object3D[] = [];
   const displays: ArtworkDisplay[] = [];
   const colliders: THREE.Box3[] = [];
+  const doorSystems: Array<{
+    center: THREE.Vector3;
+    leaves: THREE.Group[];
+    bounds: THREE.Box3[];
+    progress: number;
+  }> = [];
+  const doorFrameMaterial = new THREE.MeshStandardMaterial({ color: 0x604a31, roughness: 0.3, metalness: 0.72 });
+  const doorGlassMaterial = new THREE.MeshStandardMaterial({
+    color: 0xb6c5bf,
+    roughness: 0.28,
+    metalness: 0.08,
+    transparent: true,
+    opacity: 0.3,
+    side: THREE.DoubleSide,
+    depthWrite: false,
+  });
+  const doorLeafWidth = 1.5;
+  const doorHeight = 4.55;
+  const doorDepth = 0.1;
+  const doorBoxGeometry = new THREE.BoxGeometry(1, 1, 1);
+  const doorGeometryPart = (
+    parent: THREE.Group,
+    material: THREE.Material,
+    x: number, y: number, z: number,
+    width: number, height: number, depth: number,
+  ) => {
+    const part = new THREE.Mesh(doorBoxGeometry, material);
+    part.position.set(x, y, z);
+    part.scale.set(width, height, depth);
+    part.castShadow = false;
+    parent.add(part);
+  };
+  const addAutomaticDoor = (x: number, z: number, yaw: number) => {
+    const doorway = new THREE.Group();
+    doorway.position.set(x, 0, z);
+    doorway.rotation.y = yaw;
+    scene.add(doorway);
+
+    const leaves: THREE.Group[] = [];
+    const bounds: THREE.Box3[] = [];
+    for (const side of [-1, 1]) {
+      const leaf = new THREE.Group();
+      leaf.position.set(side * doorLeafWidth / 2, doorHeight / 2, 0.07);
+      doorway.add(leaf);
+      doorGeometryPart(leaf, doorGlassMaterial, 0, 0, doorDepth * 0.54,
+        doorLeafWidth - 0.15, doorHeight - 0.16, 0.018);
+      doorGeometryPart(leaf, doorFrameMaterial, -doorLeafWidth / 2 + 0.045, 0, doorDepth * 0.62,
+        0.055, doorHeight, 0.035);
+      doorGeometryPart(leaf, doorFrameMaterial, doorLeafWidth / 2 - 0.045, 0, doorDepth * 0.62,
+        0.055, doorHeight, 0.035);
+      doorGeometryPart(leaf, doorFrameMaterial, 0, -doorHeight / 2 + 0.045, doorDepth * 0.62,
+        doorLeafWidth, 0.055, 0.035);
+      doorGeometryPart(leaf, doorFrameMaterial, 0, doorHeight / 2 - 0.045, doorDepth * 0.62,
+        doorLeafWidth, 0.055, 0.035);
+      leaves.push(leaf);
+      const collider = new THREE.Box3();
+      colliders.push(collider);
+      bounds.push(collider);
+    }
+    doorSystems.push({ center: new THREE.Vector3(x, 0, z), leaves, bounds, progress: 0 });
+  };
+  const addRoomFans = (rooms: Array<{ x0: number; x1: number; z0: number; z1: number }>) => {
+    const rotors: THREE.Group[] = [];
+    const fanMetal = new THREE.MeshStandardMaterial({ color: 0x252a2d, roughness: 0.42, metalness: 0.72 });
+    const fanBladeMaterial = new THREE.MeshStandardMaterial({ color: 0x303437, roughness: 0.55, metalness: 0.62 });
+    const fanRodGeometry = new THREE.CylinderGeometry(0.055, 0.065, 0.42, 12);
+    const fanMotorGeometry = new THREE.CylinderGeometry(0.26, 0.34, 0.24, 16);
+    const fanCapGeometry = new THREE.SphereGeometry(0.12, 12, 8);
+    const bladeShape = new THREE.Shape();
+    bladeShape.moveTo(0.12, -0.18);
+    bladeShape.lineTo(2.55, -0.34);
+    bladeShape.lineTo(3.05, -0.2);
+    bladeShape.lineTo(3.18, 0.02);
+    bladeShape.lineTo(2.76, 0.31);
+    bladeShape.lineTo(0.12, 0.18);
+    bladeShape.closePath();
+    const bladeGeometry = new THREE.ExtrudeGeometry(bladeShape, {
+      depth: 0.075,
+      bevelEnabled: true,
+      bevelSegments: 1,
+      steps: 1,
+      bevelSize: 0.035,
+      bevelThickness: 0.025,
+    });
+
+    for (const room of rooms) {
+      const fan = new THREE.Group();
+      fan.position.set((room.x0 + room.x1) / 2, WALL_HEIGHT - 0.16, (room.z0 + room.z1) / 2);
+      scene.add(fan);
+      const rod = new THREE.Mesh(fanRodGeometry, fanMetal);
+      rod.position.y = -0.21;
+      fan.add(rod);
+      const motor = new THREE.Mesh(fanMotorGeometry, fanMetal);
+      motor.position.y = -0.48;
+      fan.add(motor);
+      const rotor = new THREE.Group();
+      rotor.position.y = -0.61;
+      fan.add(rotor);
+      const centerCap = new THREE.Mesh(fanCapGeometry, trimMaterial);
+      centerCap.scale.set(1.2, 0.72, 1.2);
+      rotor.add(centerCap);
+
+      for (let i = 0; i < 5; i++) {
+        const mount = new THREE.Group();
+        mount.rotation.y = i * Math.PI * 2 / 5;
+        rotor.add(mount);
+        const blade = new THREE.Mesh(bladeGeometry, fanBladeMaterial);
+        blade.rotation.x = -Math.PI / 2;
+        blade.castShadow = false;
+        mount.add(blade);
+      }
+      rotors.push(rotor);
+    }
+    return (time: number) => {
+      for (let i = 0; i < rotors.length; i++) rotors[i].rotation.y = time * 0.32 + (i % 2) * 0.14;
+    };
+  };
   const baseTransforms: THREE.Matrix4[] = [];
   const postTransforms: THREE.Matrix4[] = [];
   const finialTransforms: THREE.Matrix4[] = [];
@@ -271,6 +388,7 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
   // Five connected spaces keep long sight lines while the cross-shaped layout
   // makes it easy to explore without getting trapped against a wall.
   for (const room of rooms) addFloor(room);
+  const animateRoomFans = addRoomFans(rooms);
 
   // Central hall: three-metre portals keep each wing connected while making
   // the cross walls read as continuous architecture instead of one open hall.
@@ -295,6 +413,13 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     for (const side of [-1, 1]) addBox(frameGeometry, trimMaterial, x, 2.8, side * 1.72, 0.52, 5.6, 0.1);
     addBox(frameGeometry, trimMaterial, x, 5.08, 0, 0.52, 0.09, 3.55);
   }
+
+  // Each of the four wing portals has a pair of sliding glass doors. Their
+  // colliders follow the leaves so the opening becomes walkable as they slide.
+  addAutomaticDoor(0, -11.72, 0);
+  addAutomaticDoor(0, 11.72, Math.PI);
+  addAutomaticDoor(-12.72, 0, Math.PI / 2);
+  addAutomaticDoor(12.72, 0, -Math.PI / 2);
 
   // Wing perimeter walls and their shared partitions.
   addWall(-13, -25, 0.42, WALL_HEIGHT, 26);
@@ -623,8 +748,25 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
 
   const animationBase = wingSculptures.map((sculpture) => sculpture.rotation.y);
   const animateDetails = (time: number) => {
+    animateRoomFans(time);
     for (let i = 0; i < wingSculptures.length; i++) {
       wingSculptures[i].rotation.y = animationBase[i] + time * (i % 2 ? -0.045 : 0.045);
+    }
+  };
+
+  const updateDoors = (position: THREE.Vector3, dt: number) => {
+    for (const door of doorSystems) {
+      const distance = Math.hypot(position.x - door.center.x, position.z - door.center.z);
+      const open = distance < (door.progress > 0.01 ? 7.5 : 6.2);
+      const target = open ? 1 : 0;
+      door.progress += (target - door.progress) * (1 - Math.exp(-7.5 * dt));
+      for (let i = 0; i < door.leaves.length; i++) {
+        const side = i === 0 ? -1 : 1;
+        const leaf = door.leaves[i];
+        leaf.position.x = side * (doorLeafWidth / 2 + doorLeafWidth * door.progress);
+        leaf.updateWorldMatrix(true, true);
+        door.bounds[i].setFromObject(leaf);
+      }
     }
   };
 
@@ -673,6 +815,7 @@ export function buildGallery(scene: THREE.Scene, artworks: ArtworkMeta[], onAsse
     rooms,
     loadNearbyArt,
     animateDetails,
+    updateDoors,
     getModelPreview(file: string) {
       return modelPreviews.get(file)?.clone(true) ?? null;
     },
