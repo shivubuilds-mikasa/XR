@@ -10,7 +10,8 @@ Explore a first-person 3D art museum, meet the collection up close, and open eve
 
 <br />
 
-[![Enter the gallery](https://img.shields.io/badge/✦_ENTER_THE_GALLERY-LIVE_DEMO-cda96e?style=for-the-badge&labelColor=17211b)](https://shivubuilds-mikasa.github.io/XR/)
+[![Enter the gallery](https://img.shields.io/badge/✦_ENTER_THE_GALLERY-LIVE_DEMO-cda96e?style=for-the-badge&labelColor=17211b)](https://spiffy-elf-cca541.netlify.app/)
+[![Download the Quest app](https://img.shields.io/badge/⬇_DOWNLOAD-META_QUEST_APK-2d6b45?style=for-the-badge&labelColor=17211b)](https://github.com/shivubuilds-mikasa/XR/raw/refs/heads/main/Atelier-Museum-Quest3.apk)
 [![Three.js](https://img.shields.io/badge/BUILT_WITH-Three.js-eee8da?style=for-the-badge&labelColor=17211b&logo=threedotjs&logoColor=cda96e)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/POWERED_BY-Vite-eee8da?style=for-the-badge&labelColor=17211b&logo=vite&logoColor=bd93f9)](https://vite.dev/)
 
@@ -61,7 +62,7 @@ Artwork is loaded as it comes into view. The renderer adapts its workload when f
 </table>
 
 ### 🥽 Visit in VR
-Open the [live museum](https://shivubuilds-mikasa.github.io/XR/) in Meta Quest 3 Browser and choose **ENTER VR**. Point a controller at an exhibit and squeeze its trigger to open the in-headset story panel; squeeze again to return. Use the left thumbstick to move and turn your head to look around.
+Open the [live museum](https://spiffy-elf-cca541.netlify.app/) in Meta Quest 3 Browser and choose **ENTER VR**. Or [download the Quest app APK](https://github.com/shivubuilds-mikasa/XR/raw/refs/heads/main/Atelier-Museum-Quest3.apk) and install it on your headset. Point a controller at an exhibit and squeeze its trigger to open the in-headset story panel; squeeze again to return. Use the left thumbstick to move and turn your head to look around.
 
 <br />
 
@@ -118,7 +119,7 @@ npm run build
 npm run preview
 ```
 
-Pushes to `main` build and publish the site through GitHub Pages.
+The live site is hosted on Netlify: [spiffy-elf-cca541.netlify.app](https://spiffy-elf-cca541.netlify.app/).
 
 <br />
 
@@ -133,6 +134,8 @@ XR/
 │   └── models/featured/    Optimized gallery objects
 ├── README/                 Animated project artwork
 ├── src/                    Three.js scene, controls, loading, and UI
+├── quest-app/              Android wrapper project for Meta Quest
+├── Atelier-Museum-Quest3.apk  Installable Quest release
 ├── index.html
 └── vite.config.ts
 ```
@@ -143,8 +146,8 @@ XR/
 
 ### Made for the joy of looking closer.
 
-[**Open the live museum →**](https://shivubuilds-mikasa.github.io/XR/)
+[**Open the live museum →**](https://spiffy-elf-cca541.netlify.app/)
 
-<sub>Three.js · TypeScript · Vite · GitHub Pages</sub>
+<sub>Three.js · TypeScript · Vite · Netlify · Meta Quest 3</sub>
 
 </div>
