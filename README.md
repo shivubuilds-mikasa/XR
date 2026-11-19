@@ -5,7 +5,6 @@
 <br />
 
 ### A museum you can walk into.
-
 Explore a first-person 3D art museum, meet the collection up close, and open every exhibit for its story.
 
 <br />
