@@ -29,7 +29,7 @@ Atelier Museum turns a browser tab into a quiet, explorable exhibition. Wander t
 
 <div align="center">
 
-| **5** connected rooms | **111** paintings | **4** 3D objects | **1** very dramatic Kabali moment |
+| **5** connected rooms | **111** paintings | **4** 3D objects | Soft ambient soundtrack |
 |:---:|:---:|:---:|:---:|
 
 </div>
@@ -51,8 +51,8 @@ Focus on a painting or sculpture and press <kbd>Space</kbd> for a full-size view
 </td>
 <td width="50%" valign="top">
 
-### 🎭 Kabali Da, center stage
-Open the Kabali portrait for a cinematic, slow-motion reveal. Its entrance reacts to the included theme track, with poster motion pulsing to the music.
+### 🎵 A quieter visit
+Explore the collection with optional, low-volume background music. Sound starts when you enter and can be switched off from the top bar.
 
 ### ⚡ Built to stay smooth
 Artwork is loaded as it comes into view. The renderer adapts its workload when frame rates dip, helping the museum stay responsive across devices.
@@ -128,7 +128,7 @@ The live site is hosted on Netlify: [spiffy-elf-cca541.netlify.app](https://spif
 ```text
 XR/
 ├── public/
-│   ├── audio/              Kabali theme music
+│   ├── audio/              Museum background music
 │   ├── images/             Painting collection
 │   ├── metadata.json       Artwork titles and descriptions
 │   └── models/featured/    Optimized gallery objects

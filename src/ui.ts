@@ -20,6 +20,9 @@ export function createUI(
       </a>
       <div class="top-meta"><span class="live-dot"></span><span>THE PERMANENT COLLECTION</span></div>
       <div class="top-room"><span class="room-index">01</span><span>FIVE ROOMS<br><small>ONE CONTINUOUS VISIT</small></span></div>
+      <button class="music-toggle" id="music-toggle" type="button" aria-pressed="false" aria-label="Turn background music on">
+        <span class="music-toggle-icon" aria-hidden="true">♫</span><span id="music-label">SOUND OFF</span>
+      </button>
     </header>
 
     <div class="aim" aria-hidden="true"><span></span></div>
@@ -137,15 +140,34 @@ export function createUI(
   const detailMediaIndex = shell.querySelector<HTMLElement>('#detail-media-index')!;
   let inGallery = false;
   let indexByFile = new Map<string, number>();
-  const kabaliMusic = new Audio(`${BASE}audio/kabali-da.mp3`);
-  kabaliMusic.loop = true;
-  kabaliMusic.volume = 0.42;
-  let kabaliAudioContext: AudioContext | null = null;
-  let kabaliAnalyser: AnalyserNode | null = null;
-  let kabaliAudioSource: MediaElementAudioSourceNode | null = null;
-  let kabaliBeatFrame = 0;
-  let xrKabaliPulse = 0;
-  let xrKabaliDirection = 1;
+  const backgroundMusic = new Audio(`${BASE}audio/museum-ambience.mp3`);
+  backgroundMusic.loop = true;
+  backgroundMusic.preload = 'none';
+  backgroundMusic.volume = 0.12;
+  const musicToggle = shell.querySelector<HTMLButtonElement>('#music-toggle')!;
+  const musicLabel = shell.querySelector<HTMLElement>('#music-label')!;
+  let musicEnabled = false;
+
+  const updateMusicToggle = () => {
+    musicToggle.setAttribute('aria-pressed', String(musicEnabled));
+    musicToggle.setAttribute('aria-label', musicEnabled ? 'Turn background music off' : 'Turn background music on');
+    musicLabel.textContent = musicEnabled ? 'SOUND ON' : 'SOUND OFF';
+  };
+
+  const setMusicEnabled = (enabled: boolean) => {
+    musicEnabled = enabled;
+    updateMusicToggle();
+    if (!enabled) {
+      backgroundMusic.pause();
+      backgroundMusic.currentTime = 0;
+      return;
+    }
+    void backgroundMusic.play().catch((error: unknown) => {
+      musicEnabled = false;
+      updateMusicToggle();
+      console.warn('Museum background music could not be played.', error);
+    });
+  };
 
   const wrapText = (context: CanvasRenderingContext2D, value: string, x: number, y: number, maxWidth: number, lineHeight: number, maxLines: number) => {
     const words = value.split(/\s+/);
@@ -230,101 +252,22 @@ export function createUI(
     xrModelPreview = null;
   };
 
-  const stopKabaliBeatSync = () => {
-    if (kabaliBeatFrame) cancelAnimationFrame(kabaliBeatFrame);
-    kabaliBeatFrame = 0;
-    for (const property of ['--kabali-beat-x', '--kabali-beat-y', '--kabali-beat-scale', '--kabali-beat-rotation']) {
-      detailImage.style.removeProperty(property);
-    }
-  };
-
-  const stopKabaliMusic = () => {
-    stopKabaliBeatSync();
-    kabaliMusic.pause();
-    kabaliMusic.currentTime = 0;
-    if (kabaliAudioContext?.state === 'running') void kabaliAudioContext.suspend();
-  };
-
-  const startKabaliBeatSync = () => {
-    if (!kabaliAnalyser || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    stopKabaliBeatSync();
-    const spectrum = new Uint8Array(kabaliAnalyser.frequencyBinCount);
-    let baseline = 0;
-    let pulse = 0;
-    let direction = 1;
-    let lastBeat = -Infinity;
-    let previousTime = performance.now();
-
-    const sample = (now: number) => {
-      if (!shell.classList.contains('kabali-entry') || detailImage.hidden) {
-        stopKabaliBeatSync();
-        return;
-      }
-      kabaliAnalyser!.getByteFrequencyData(spectrum);
-      let bass = 0;
-      // Average the low bass bins; transient increases identify the track's beats.
-      for (let bin = 1; bin <= 9; bin++) bass += spectrum[bin];
-      bass /= 9;
-      const elapsed = Math.min((now - previousTime) / 1000, 0.08);
-      previousTime = now;
-      if (baseline === 0) baseline = bass;
-      const rise = bass - baseline;
-      if (bass > baseline * 1.2 && rise > 2.5 && now - lastBeat > 240) {
-        pulse = Math.min(1, 0.48 + rise / 42);
-        direction *= -1;
-        lastBeat = now;
-      } else {
-        pulse *= Math.exp(-elapsed / 0.15);
-      }
-      xrKabaliPulse = pulse;
-      xrKabaliDirection = direction;
-      baseline += (bass - baseline) * 0.035;
-      detailImage.style.setProperty('--kabali-beat-x', `${(direction * pulse * 8).toFixed(2)}px`);
-      detailImage.style.setProperty('--kabali-beat-y', `${(-pulse * 3.5).toFixed(2)}px`);
-      detailImage.style.setProperty('--kabali-beat-scale', (pulse * 0.045).toFixed(4));
-      detailImage.style.setProperty('--kabali-beat-rotation', `${(direction * pulse * 1.45).toFixed(2)}deg`);
-      kabaliBeatFrame = requestAnimationFrame(sample);
-    };
-    kabaliBeatFrame = requestAnimationFrame(sample);
-  };
-
-  const playKabaliMusic = () => {
-    try {
-      if (!kabaliAudioContext) {
-        kabaliAudioContext = new AudioContext();
-        kabaliAnalyser = kabaliAudioContext.createAnalyser();
-        kabaliAnalyser.fftSize = 1024;
-        kabaliAnalyser.smoothingTimeConstant = 0.16;
-        kabaliAudioSource = kabaliAudioContext.createMediaElementSource(kabaliMusic);
-        kabaliAudioSource.connect(kabaliAnalyser);
-        kabaliAnalyser.connect(kabaliAudioContext.destination);
-      }
-      if (kabaliAudioContext.state === 'suspended') void kabaliAudioContext.resume();
-    } catch (error) {
-      console.warn('Kabali Da beat sync is unavailable; playing the music without reactive motion.', error);
-    }
-    startKabaliBeatSync();
-    void kabaliMusic.play().catch((error: unknown) => {
-      stopKabaliBeatSync();
-      console.warn('Kabali Da background music could not be played.', error);
-    });
-  };
-
-  enter.addEventListener('click', () => onEnter());
+  musicToggle.addEventListener('click', () => setMusicEnabled(!musicEnabled));
+  enter.addEventListener('click', () => {
+    if (!musicEnabled) setMusicEnabled(true);
+    onEnter();
+  });
   shell.querySelector('.brand')!.addEventListener('click', (event) => event.preventDefault());
 
   const closeDetails = () => {
-    stopKabaliMusic();
     detailBackdrop.classList.remove('detail-visible');
     detailPanel.setAttribute('aria-hidden', 'true');
     shell.classList.remove('detail-open');
-    shell.classList.remove('kabali-entry');
     xrInfoMesh.visible = false;
     xrImageMesh.visible = false;
     xrModelBackdrop.visible = false;
     xrModelLabel.visible = false;
     clearXRModel();
-    xrKabaliPulse = 0;
     onDetailsClosed();
     onEnter();
   };
@@ -383,14 +326,6 @@ export function createUI(
     },
     showDetails(exhibit: GalleryExhibit) {
       const artwork = exhibit.kind === 'artwork' ? exhibit.artwork : null;
-      const isKabali = artwork?.file === '111-kabali-da.jpg';
-      shell.classList.remove('kabali-entry');
-      if (isKabali) {
-        // Restart the one-off poster reveal whenever this artwork is opened.
-        void shell.offsetWidth;
-        shell.classList.add('kabali-entry');
-      }
-      stopKabaliMusic();
       const titleText = artwork ? artwork.title || artwork.file : exhibit.kind === 'model' ? exhibit.title : 'Untitled';
       detailTitle.textContent = titleText;
       detailByline.textContent = artwork?.author || (exhibit.kind === 'model' ? 'Three-dimensional collection object' : 'Artist not recorded');
@@ -424,9 +359,6 @@ export function createUI(
           if (shell.classList.contains('detail-open') && xrImageMesh.visible) drawXRArtwork(xrArtworkImage);
         };
         xrArtworkImage.src = `${BASE}images/${encodeURIComponent(artwork.file)}`;
-        if (artwork.file === '111-kabali-da.jpg') {
-          playKabaliMusic();
-        }
       } else if (exhibit.kind === 'model') {
         detailImage.hidden = true;
         modelStage.hidden = false;
@@ -460,17 +392,6 @@ export function createUI(
     },
     animateXR(dt: number) {
       if (xrModelPreview && shell.classList.contains('detail-open')) xrModelPreview.rotation.y += dt * 0.35;
-      if (shell.classList.contains('kabali-entry')) {
-        xrImageMesh.position.x = -0.43 + xrKabaliDirection * xrKabaliPulse * 0.055;
-        xrImageMesh.position.y = -xrKabaliPulse * 0.024;
-        xrImageMesh.rotation.z = xrKabaliDirection * xrKabaliPulse * 0.018;
-        const scale = 1 + xrKabaliPulse * 0.045;
-        xrImageMesh.scale.set(scale, scale, 1);
-      } else {
-        xrImageMesh.position.set(-0.43, 0, -2.02);
-        xrImageMesh.rotation.z = 0;
-        xrImageMesh.scale.set(1, 1, 1);
-      }
     },
     closeDetails,
   };
