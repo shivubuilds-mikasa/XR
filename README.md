@@ -5,7 +5,7 @@
 <br />
 
 ### A museum you can walk into.
-Explore a first-person 3D art museum, meet the collection up close, and open every exhibit for its story.
+Explore Atelier Museum, a five-room 3D gallery for the web and Meta Quest 3, with 111 artworks, interactive 3D exhibits, and optional background music.
 
 <br />
 
@@ -52,7 +52,7 @@ Focus on a painting or sculpture and press <kbd>Space</kbd> for a full-size view
 <td width="50%" valign="top">
 
 ### 🎵 A quieter visit
-Explore the collection with optional, low-volume background music. Sound starts when you enter and can be switched off from the top bar.
+Optional background music begins when you enter the gallery. Adjust your listening experience with the sound control in the top bar.
 
 ### ⚡ Built to stay smooth
 Artwork is loaded as it comes into view. The renderer adapts its workload when frame rates dip, helping the museum stay responsive across devices.
