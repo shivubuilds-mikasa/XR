@@ -143,7 +143,7 @@ export function createUI(
   const backgroundMusic = new Audio(`${BASE}audio/museum-ambience.mp3`);
   backgroundMusic.loop = true;
   backgroundMusic.preload = 'none';
-  backgroundMusic.volume = 0.12;
+  backgroundMusic.volume = 0.2;
   const musicToggle = shell.querySelector<HTMLButtonElement>('#music-toggle')!;
   const musicLabel = shell.querySelector<HTMLElement>('#music-label')!;
   let musicEnabled = false;
